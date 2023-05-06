@@ -58,19 +58,9 @@ def valutazione():
 
 try:
     
-    hide_streamlit_style = """
-                <style>
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                </style>
-                """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
     jd = st.text_area(label="Valutazione dei CV in archivio rispetto a questa Job Description:",value='Inserisci qui una Job Description', height=400)
     
     st.button(label="Valuta tuti i CV in archivio", on_click=valutazione)
-
-    logger.info()
 
 
 except Exception as e:

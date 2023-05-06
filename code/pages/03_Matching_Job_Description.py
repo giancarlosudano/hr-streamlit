@@ -54,13 +54,6 @@ def valutazione():
 
 try:
     
-    hide_streamlit_style = """
-                <style>
-                footer {visibility: hidden;}
-                </style>
-                """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
-
     llm_helper = LLMHelper()
 
     st.text_area(label="Valutazione dei CV in archivio rispetto a questa Job Description:",value='Inserisci qui una Job Description', height=400)
