@@ -1,3 +1,4 @@
+import logging as logger
 import streamlit as st
 import os
 import traceback
@@ -68,6 +69,9 @@ try:
     jd = st.text_area(label="Valutazione dei CV in archivio rispetto a questa Job Description:",value='Inserisci qui una Job Description', height=400)
     
     st.button(label="Valuta tuti i CV in archivio", on_click=valutazione)
+
+    logger.info()
+
 
 except Exception as e:
     st.error(traceback.format_exc())
