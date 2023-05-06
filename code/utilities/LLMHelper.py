@@ -21,8 +21,8 @@ from langchain.document_loaders import TextLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
-from utilities.formrecognizer import AzureFormRecognizerClient
-from utilities.azureblobstorage import AzureBlobStorageClient
+from utilities.AzureFormRecognizerClient import AzureFormRecognizerClient
+from utilities.AzureBlobStorageClient import AzureBlobStorageClient
 from utilities.customprompt import PROMPT
 
 import pandas as pd

@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import traceback
-from utilities.helper import LLMHelper
+from utilities.LLMHelper import LLMHelper
 import time
 
 def valutazione():
@@ -48,6 +48,7 @@ def valutazione():
 
             cv["Matching"] = matching_count
 
+        st.markdown()
         st.dataframe(cvs, use_container_width=True)
 
     except Exception as e:
@@ -55,18 +56,7 @@ def valutazione():
         st.error(traceback.format_exc())
 
 try:
-    # Set page layout to wide screen and menu item
-    menu_items = {
-	'Get help': None,
-	'Report a bug': None,
-	'About': '''
-	 ## Embeddings App
-
-	Document Reader Sample Demo.
-	'''
-    }
-    st.set_page_config(layout="wide", menu_items=menu_items)
-
+    
     hide_streamlit_style = """
                 <style>
                 #MainMenu {visibility: hidden;}

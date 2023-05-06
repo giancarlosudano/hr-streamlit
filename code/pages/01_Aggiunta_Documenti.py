@@ -5,11 +5,11 @@ import requests
 import mimetypes
 import traceback
 import chardet
-from utilities.helper import LLMHelper
+from utilities.LLMHelper import LLMHelper
 import uuid
 from redis.exceptions import ResponseError 
 from urllib import parse
-    
+
 def upload_cv(bytes_data: bytes, file_name: str):
     # Upload a new file
     st.session_state['filename'] = file_name
@@ -25,17 +25,7 @@ def upload_jd(bytes_data: bytes, file_name: str):
     st.session_state['file_url'] = llm_helper.blob_client.upload_file(bytes_data, st.session_state['filename'], content_type=content_type+charset)
 
 try:
-    # Set page layout to wide screen and menu item
-    menu_items = {
-	'Get help': None,
-	'Report a bug': None,
-	'About': '''
-	 ## Embeddings App
-	 Embedding testing application.
-	'''
-    }
-    st.set_page_config(layout="wide", menu_items=menu_items)
-
+    
     llm_helper = LLMHelper()
 
     with st.expander("Caricare un nuovo CV", expanded=True):

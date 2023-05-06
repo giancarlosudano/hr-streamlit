@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import traceback
-from utilities.helper import LLMHelper
+from utilities.LLMHelper import LLMHelper
 
 def valutazione():
     # Check if the deployment is working
