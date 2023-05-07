@@ -8,7 +8,7 @@ class AzureFormRecognizerClient:
 
         load_dotenv()
 
-        self.pages_per_embeddings = int(os.getenv('PAGES_PER_EMBEDDINGS', 2))
+        self.pages_per_embeddings = 4
         self.section_to_exclude = ['footnote', 'pageHeader', 'pageFooter', 'pageNumber']
 
         self.form_recognizer_endpoint : str = form_recognizer_endpoint if form_recognizer_endpoint else os.getenv('FORM_RECOGNIZER_ENDPOINT')
@@ -28,7 +28,7 @@ class AzureFormRecognizerClient:
         page_result = ''
         for p in layout.paragraphs:
             page_number = p.bounding_regions[0].page_number
-            output_file_id = int((page_number - 1 ) / self.pages_per_embeddings)
+            output_file_id = int((page_number - 1) / self.pages_per_embeddings)
 
             if len(results) < output_file_id + 1:
                 results.append('')
