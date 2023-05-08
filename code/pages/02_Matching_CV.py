@@ -4,7 +4,10 @@ import os
 import traceback
 from utilities.LLMHelper import LLMHelper
 from utilities.AzureFormRecognizerClient import AzureFormRecognizerClient
+from collections import OrderedDict 
 import time
+import json
+import pandas as pd
 
 def valutazione():
     # Check if the deployment is working
@@ -13,8 +16,6 @@ def valutazione():
 
         llm_helper = LLMHelper()
 
-        #ottengo la lista delle skill dalla JD
-        time.sleep(2)
         start_time_gpt = time.perf_counter()
         llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job Description
         ###
@@ -24,9 +25,14 @@ def valutazione():
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
 
-        st.success(f"Risposta GPT in {gpt_duration:.2f}: {llm_skills_text}")
-                
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*")
+
         llm_skills = llm_skills_text.split('\n')
+
+        for skill in llm_skills:
+            if skill == "":
+                llm_skills.remove(skill)
+
         st.dataframe(llm_skills, use_container_width=True)
         
         cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
@@ -39,35 +45,48 @@ def valutazione():
             end_time_cv = time.perf_counter()
             duration = end_time_cv - start_time_cv
             cv = results[0]
-            st.success("CV caricato in {:.2f} secondi".format(duration))
+            
+            exp = st.expander(f"Documento {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
+            with exp:
+                st.markdown(cv)
 
             matching_count = 0
+            delay = int(st.session_state['delay'])
+
             for skill in llm_skills:
-                st.success("Waiting 60 sec...")
-                time.sleep(60)
-                llm_helper1 = LLMHelper()
-                llm_match_text = llm_helper1.get_completion(f"""
+                st.markdown(f"CV {cv_url['file']} Waiting {delay} sec...")
+                time.sleep(delay)
+
+                question = f"""
                 Verifica se nel seguente CV:
                 ###
                 {cv}
                 ###
-                il candidato ha questa skil:
+                è presente la seguente skil:
                 {skill}
-                Rispondi con true o false senza aggiungere altro alla risposta
-                """)
-                llm_match = False
-                if llm_match_text.lower() == "true":
-                    llm_match = True
-                
-                if llm_match:
-                    matching_count += 1
 
-            cv['matching'] = matching_count
+                Rispondi con True o False senza aggiungere altro alla risposta
+                """
+                llm_match_text = llm_helper.get_completion(question)
 
-        st.dataframe(cv_url, use_container_width=True)
+                st.markdown(f"skill {skill} GPT response *{llm_match_text}*")
+
+                if bool(llm_match_text):
+                    matching_count = matching_count + 1
+
+                print(matching_count)
+
+                st.markdown(f"Matching {matching_count}")
+
+            cv_url['matching'] = matching_count
+
+        df = pd.DataFrame(cv_urls)
+        st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
 
     except Exception as e:
-        st.error(traceback.format_exc())
+        error_string = traceback.format_exc() 
+        st.error(error_string)
+        print(error_string)
 
 try:
     
@@ -76,10 +95,12 @@ Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
 e deve conoscere il framework JUnit e Selenium
     """
 
-    jd = st.text_area(label="Valutazione dei CV in archivio rispetto a questa Job Description:",
-                      value='Inserisci qui una Job Description', height=400)
+    jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
+                      value=sample, height=400)
     
-    st.button(label="Valuta tuti i CV in archivio", on_click=valutazione)
+    st.button(label="Calcola match", on_click=valutazione)
+
+    result_placeholder = st.empty()
 
 except Exception as e:
     st.error(traceback.format_exc())

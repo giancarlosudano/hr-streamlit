@@ -63,10 +63,12 @@ class AzureBlobStorageClient:
                                      expiry=datetime.utcnow() + timedelta(hours=3))
         
         urls = []
-        for blob in blob_list:    
+        for blob in blob_list:
+            link = f"https://{self.account_name}.blob.core.windows.net/{container_name}/{blob.name}?{sas}"
             urls.append({
-                "file" : blob.name, 
-                "fullpath": f"https://{self.account_name}.blob.core.windows.net/{container_name}/{blob.name}?{sas}",                
+                "file" : blob.name,
+                "matching" : 0,
+                "fullpath": link
                 })
         return urls
     
