@@ -45,7 +45,7 @@ try:
     
     tokens_response = st.slider("Tokens response length", 100, 500, 400)
     temperature = st.slider("Temperature", 0.0, 1.0, 0.1)
-    delay = st.slider("Delay for any call in iterations", 0, 90, 60)
+    delay = st.slider("Delay for any call in iterations", 0, 90, 1)
         
     st.session_state["token_response"] = tokens_response
     st.session_state["temperature"] = temperature
