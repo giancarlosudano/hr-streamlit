@@ -4,12 +4,12 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, g
 from dotenv import load_dotenv
 
 class AzureBlobStorageClient:
-    def __init__(self, account_name: str, account_key: str):
+    def __init__(self):
 
         load_dotenv()
 
-        self.account_name = account_name if account_name else os.getenv('BLOB_ACCOUNT_NAME')
-        self.account_key = account_key if account_key else os.getenv('BLOB_ACCOUNT_KEY')
+        self.account_name : str = os.getenv('BLOB_ACCOUNT_NAME') or ''
+        self.account_key = os.getenv('BLOB_ACCOUNT_KEY') or ''
         self.connect_str : str = f"DefaultEndpointsProtocol=https;AccountName={self.account_name};AccountKey={self.account_key};EndpointSuffix=core.windows.net"
         self.blob_service_client : BlobServiceClient = BlobServiceClient.from_connection_string(self.connect_str)
 
@@ -40,7 +40,7 @@ class AzureBlobStorageClient:
         files = []
         for blob in blob_list:
             
-            downloader = container_client.download_blob(blob=blob.name, 
+            downloader = container_client.download_blob(blob=blob.name or "", 
                                                         max_concurrency=1, 
                                                         encoding='UTF-8')
             
@@ -48,7 +48,7 @@ class AzureBlobStorageClient:
                 "file" : blob.name,
                 "content" : downloader.readall(),
                 "matching" : 0, 
-                "fullpath": f"https://{self.account_name}.blob.core.windows.net/{self.container_name}/{blob.name}?{sas}",                
+                "fullpath": f"https://{self.account_name}.blob.core.windows.net/{container_name}/{blob.name}?{sas}",                
                 })
         return files
 
@@ -74,8 +74,8 @@ class AzureBlobStorageClient:
         return urls
     
     
-    def upsert_blob_metadata(self, file_name, metadata):
-        blob_client = BlobServiceClient.from_connection_string(self.connect_str).get_blob_client(container=self.container_name, blob=file_name)
+    def upsert_blob_metadata(self, file_name, container_name , metadata):
+        blob_client = BlobServiceClient.from_connection_string(self.connect_str).get_blob_client(container=container_name, blob=file_name)
         # Read metadata from the blob
         blob_metadata = blob_client.get_blob_properties().metadata
         # Update metadata
@@ -83,10 +83,10 @@ class AzureBlobStorageClient:
         # Add metadata to the blob
         blob_client.set_blob_metadata(metadata= blob_metadata)
 
-    def get_container_sas(self):
+    def get_container_sas(self, container_name : str):
         # Generate a SAS URL to the container and return it
-        return "?" + generate_container_sas(account_name= self.account_name, container_name= self.container_name,account_key=self.account_key,  permission="r", expiry=datetime.utcnow() + timedelta(hours=1))
+        return "?" + generate_container_sas(account_name= self.account_name, container_name= container_name,account_key=self.account_key,  permission="r", expiry=datetime.utcnow() + timedelta(hours=1))
 
-    def get_blob_sas(self, file_name):
+    def get_blob_sas(self, file_name, container_name : str):
         # Generate a SAS URL to the blob and return it
-        return f"https://{self.account_name}.blob.core.windows.net/{self.container_name}/{file_name}" + "?" + generate_blob_sas(account_name= self.account_name, container_name=self.container_name, blob_name= file_name, account_key= self.account_key, permission='r', expiry=datetime.utcnow() + timedelta(hours=1))
+        return f"https://{self.account_name}.blob.core.windows.net/{container_name}/{file_name}" + "?" + generate_blob_sas(account_name= self.account_name, container_name=container_name, blob_name= file_name, account_key= self.account_key, permission='r', expiry=datetime.utcnow() + timedelta(hours=1))
