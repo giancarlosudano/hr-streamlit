@@ -1,18 +1,17 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Python:Streamlit",
+            "name": "Debug Streamlit",
             "type": "python",
             "request": "launch",
-            "module": "streamlit",
-            "args": [
-                 "run",
-                 "${file}",
-                 "--server.port",
-                 "8501"
-            ]
+            "module": "streamlit.cli",
+            "args": ["run", "${workspaceFolder}/code/Home.py"],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "console": "integratedTerminal"
         }
     ]
 }

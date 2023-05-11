@@ -4,12 +4,12 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, g
 from dotenv import load_dotenv
 
 class AzureBlobStorageClient:
-    def __init__(self, account_name: str = None, account_key: str = None):
+    def __init__(self, account_name: str, account_key: str):
 
         load_dotenv()
 
-        self.account_name : str = account_name if account_name else os.getenv('BLOB_ACCOUNT_NAME')
-        self.account_key : str = account_key if account_key else os.getenv('BLOB_ACCOUNT_KEY')
+        self.account_name = account_name if account_name else os.getenv('BLOB_ACCOUNT_NAME')
+        self.account_key = account_key if account_key else os.getenv('BLOB_ACCOUNT_KEY')
         self.connect_str : str = f"DefaultEndpointsProtocol=https;AccountName={self.account_name};AccountKey={self.account_key};EndpointSuffix=core.windows.net"
         self.blob_service_client : BlobServiceClient = BlobServiceClient.from_connection_string(self.connect_str)
 
@@ -17,7 +17,8 @@ class AzureBlobStorageClient:
         blob_client = self.blob_service_client.get_blob_client(container=container_name, blob=file_name)
         
         blob_client.upload_blob(bytes_data, overwrite=True, content_settings=ContentSettings(content_type=content_type))
-        return blob_client.url + '?' + generate_blob_sas(self.account_name, container_name, file_name,account_key=self.account_key,  permission="r", expiry=datetime.utcnow() + timedelta(hours=3))
+        sas = generate_blob_sas(account_name=self.account_name or "", container_name=container_name, blob_name=file_name, account_key=self.account_key or "", permission="r", expiry=datetime.utcnow() + timedelta(hours=3))
+        return blob_client.url + '?' + sas
     
     def download_blob_to_string(self, blob_service_client: BlobServiceClient, container_name, blob_name):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
