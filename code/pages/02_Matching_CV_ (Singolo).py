@@ -20,7 +20,11 @@ def valutazione():
         llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job Description
         ###
         {jd}
-        ###estrai tutte le skill e mostrale riga per riga, non includere niente altro nella risposta, non usare punti elenco. Descrivi bene la skill anche con il numero di anni richiesto. Non includere righe vuote nella risposta.
+        ###estrai tutte i requisiti richiesti e mostrale riga per riga, non aggregare i requisiti in singole righe.
+        Non includere niente altro nella risposta, non usare punti elenco. 
+        Non prendere in considerazione gli anni di esperienza richiesti. 
+        Non includere righe vuote nella risposta.
+        
         """)
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
@@ -39,44 +43,48 @@ def valutazione():
         form_client = AzureFormRecognizerClient()
 
         for cv_url in cv_urls:
+            try:
+                start_time_cv = time.perf_counter()
+                results = form_client.analyze_read(cv_url['fullpath'])
+                end_time_cv = time.perf_counter()
+                duration = end_time_cv - start_time_cv
+                cv = results[0]
+                
+                exp = st.expander(f"Documento {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
+                with exp:
+                    st.markdown(cv)
 
-            start_time_cv = time.perf_counter()
-            results = form_client.analyze_read(cv_url['fullpath'])
-            end_time_cv = time.perf_counter()
-            duration = end_time_cv - start_time_cv
-            cv = results[0]
-            
-            exp = st.expander(f"Documento {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
-            with exp:
-                st.markdown(cv)
+                matching_count = 0
+                delay = int(st.session_state['delay'])
 
-            matching_count = 0
-            delay = int(st.session_state['delay'])
+                for skill in llm_skills:
+                    st.markdown(f"CV {cv_url['file']} Waiting {delay} sec...")
+                    time.sleep(delay)
 
-            for skill in llm_skills:
-                st.markdown(f"CV {cv_url['file']} Waiting {delay} sec...")
-                time.sleep(delay)
+                    question = f"""
+                    Verifica se nel seguente CV:
+                    ###
+                    {cv}
+                    ###
+                    è presente il seguente requisito:
+                    {skill}
 
-                question = f"""
-                Verifica se nel seguente CV:
-                ###
-                {cv}
-                ###
-                è presente il seguente requisito:
-                {skill}
+                    Non considerare gli anni di esperienze richiesti se presenti. Rispondi solo con True o False senza aggiungere altro alla risposta
+                    """
+                    llm_match_text = llm_helper.get_completion(question)
 
-                Rispondi con True o False senza aggiungere altro alla risposta
-                """
-                llm_match_text = llm_helper.get_completion(question)
+                    st.markdown(f"**Skill:** {skill} (GPT response **{llm_match_text.strip()}**)")
 
-                st.markdown(f"**Skill:** {skill} (GPT response **{llm_match_text}**)")
+                    if llm_match_text.strip().lower() == 'true':
+                        matching_count = matching_count + 1
 
-                if llm_match_text.strip().lower() == 'true':
-                    matching_count = matching_count + 1
+                    st.markdown(f"Matching {matching_count}")
 
-                st.markdown(f"Matching {matching_count}")
+                cv_url['matching'] = matching_count
 
-            cv_url['matching'] = matching_count
+            except Exception as e:
+                error_string = traceback.format_exc() 
+                st.error(error_string)
 
         df = pd.DataFrame(cv_urls)
         df = df.sort_values(by=['matching'], ascending=False)
@@ -110,7 +118,7 @@ e deve conoscere il framework JUnit e Selenium
     """
 
     jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
-                      value=sample, height=400)
+                      value=sample, height=300)
 
     st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 90, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)

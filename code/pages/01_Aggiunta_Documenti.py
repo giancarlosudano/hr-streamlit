@@ -5,8 +5,6 @@ import traceback
 import chardet
 from utilities.LLMHelper import LLMHelper
 from utilities.AzureBlobStorageClient import AzureBlobStorageClient
-from urllib import parse
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 try:
     st.title("Aggiunta CV e Job Description")
