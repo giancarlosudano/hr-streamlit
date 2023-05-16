@@ -29,6 +29,8 @@ def check_deployment():
 
 try:
     StreamlitHelper.hide_footer()
+
+    st.title("Matching CV e Job Description con Open AI")
     
     llm_helper = LLMHelper()
 
@@ -47,10 +49,13 @@ try:
     st.session_state["token_response"] = st.slider("Tokens response length", 100, 500, 400)
     st.session_state["temperature"] = st.slider("Temperature", 0.0, 1.0, 0.1)
     st.session_state['delay'] = st.slider("Delay for any call in iterations", 0, 90, 1)
-    st.session_state['top_p'] = st.slider("Top P", 0.0, 1.0, 0.9)
-    st.session_state['frequency_penalty'] = st.slider("Frequency Penalty", 0.0, 1.0, 0.0)
-    st.session_state['presence_penalty'] = st.slider("Presence Penalty", 0.0, 1.0, 0.6)
-    st.session_state['best_of'] = st.slider("Best of", 1, 10, 1)
+
+    exp = st.expander("Impostazioni avanzate (non ancora usate)", expanded=False)
+
+    st.session_state['top_p'] = exp.slider("Top P", 0.0, 1.0, 0.9)
+    st.session_state['frequency_penalty'] = exp.slider("Frequency Penalty", 0.0, 1.0, 0.0)
+    st.session_state['presence_penalty'] = exp.slider("Presence Penalty", 0.0, 1.0, 0.6)
+    st.session_state['best_of'] = exp.slider("Best of", 1, 10, 1)
     
 except Exception:
     st.error(traceback.format_exc())
