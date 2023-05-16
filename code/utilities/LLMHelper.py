@@ -37,6 +37,7 @@ class LLMHelper:
         llm: AzureOpenAI = None,
         temperature: float = None,
         max_tokens: int = None,
+        vector_store: VectorStore = None,
         top_p : float = None,
         frequency_penalty : float = None,
         presence_penalty : float = None,
