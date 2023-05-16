@@ -71,7 +71,7 @@ def valutazione():
 
                 st.markdown(f"**Skill:** {skill} (GPT response **{llm_match_text}**)")
 
-                if bool(llm_match_text.strip()):
+                if llm_match_text.strip().lower() == 'true':
                     matching_count = matching_count + 1
 
                 st.markdown(f"Matching {matching_count}")
