@@ -27,7 +27,7 @@ def valutazione():
 
         st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*")
 
-        llm_skills = llm_skills_text.split('\n')
+        llm_skills = llm_skills_text.strip().split('\n')
 
         for skill in llm_skills:
             if skill == "":
@@ -62,25 +62,25 @@ def valutazione():
                 ###
                 {cv}
                 ###
-                è presente la seguente skil:
+                è presente il seguente requisito:
                 {skill}
 
                 Rispondi con True o False senza aggiungere altro alla risposta
                 """
                 llm_match_text = llm_helper.get_completion(question)
 
-                st.markdown(f"skill {skill} GPT response *{llm_match_text}*")
+                st.markdown(f"**Skill:** {skill} (GPT response **{llm_match_text}**)")
 
-                if bool(llm_match_text):
+                if bool(llm_match_text.strip()):
                     matching_count = matching_count + 1
-
-                print(matching_count)
 
                 st.markdown(f"Matching {matching_count}")
 
             cv_url['matching'] = matching_count
 
         df = pd.DataFrame(cv_urls)
+        df = df.sort_values(by=['matching'], ascending=False)
+
         st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
 
     except Exception as e:
@@ -90,6 +90,9 @@ def valutazione():
 
 try:
     
+    if st.session_state['delay'] == None or st.session_state['delay'] == '':
+        st.session_state['delay'] = 1
+    
     sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
 Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
 e deve conoscere il framework JUnit e Selenium
@@ -97,7 +100,8 @@ e deve conoscere il framework JUnit e Selenium
 
     jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
                       value=sample, height=400)
-    
+
+    st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 90, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)
 
     result_placeholder = st.empty()

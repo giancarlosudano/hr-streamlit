@@ -29,6 +29,7 @@ def check_deployment():
 
 try:
     StreamlitHelper.hide_footer()
+    
     llm_helper = LLMHelper()
 
     col1, col2, col3 = st.columns([1,2,1])
@@ -43,13 +44,13 @@ try:
             [os.environ['OPENAI_ENGINE']]
         )
     
-    tokens_response = st.slider("Tokens response length", 100, 500, 400)
-    temperature = st.slider("Temperature", 0.0, 1.0, 0.1)
-    delay = st.slider("Delay for any call in iterations", 0, 90, 1)
-        
-    st.session_state["token_response"] = tokens_response
-    st.session_state["temperature"] = temperature
-    st.session_state['delay'] = delay
-		
+    st.session_state["token_response"] = st.slider("Tokens response length", 100, 500, 400)
+    st.session_state["temperature"] = st.slider("Temperature", 0.0, 1.0, 0.1)
+    st.session_state['delay'] = st.slider("Delay for any call in iterations", 0, 90, 1)
+    st.session_state['top_p'] = st.slider("Top P", 0.0, 1.0, 0.9)
+    st.session_state['frequency_penalty'] = st.slider("Frequency Penalty", 0.0, 1.0, 0.0)
+    st.session_state['presence_penalty'] = st.slider("Presence Penalty", 0.0, 1.0, 0.6)
+    st.session_state['best_of'] = st.slider("Best of", 1, 10, 1)
+    
 except Exception:
     st.error(traceback.format_exc())

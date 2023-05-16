@@ -27,7 +27,7 @@ def valutazione():
 
         st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*")
 
-        llm_skills = llm_skills_text.split('\n')
+        llm_skills = llm_skills_text.strip().split('\n')
 
         for skill in llm_skills:
             if skill == "":
@@ -72,16 +72,16 @@ def valutazione():
 
                 st.markdown(f"skill {skill} GPT response **{llm_match_text}**")
 
-                if bool(llm_match_text):
+                if bool(llm_match_text.strip()):
                     matching_count = matching_count + 1
-
-                print(matching_count)
 
                 st.markdown(f"Matching {matching_count}")
 
             jd_url['matching'] = matching_count
 
         df = pd.DataFrame(jd_urls)
+        df = df.sort_values(by=['matching'], ascending=False)
+
         st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
 
     except Exception as e:
@@ -91,6 +91,9 @@ def valutazione():
 
 try:
     
+    if st.session_state['delay'] == None or st.session_state['delay'] == '':
+        st.session_state['delay'] = 1
+
     sample = """Nome Cognome Esperto di Test Automation Sommario Esperto di Test Automation con oltre 5 anni di esperienza nella progettazione, 
     implementazione e mantenimento di framework di test automation per applicazioni web e mobile. 
     Competenze approfondite su Selenium, Appium, TestNG, JUnit e altre tecnologie di test automation. 
@@ -117,6 +120,7 @@ try:
     cv = st.text_area(label="Matching dei Job in archivio rispetto a questo CV:",
                       value=sample, height=400)
     
+    st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 90, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)
 
     result_placeholder = st.empty()
