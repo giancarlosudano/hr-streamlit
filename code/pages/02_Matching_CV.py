@@ -80,7 +80,8 @@ def valutazione():
 
         df = pd.DataFrame(cv_urls)
         df = df.sort_values(by=['matching'], ascending=False)
-
+        st.write('')
+        st.markdown('## Risultati Matching CV')
         st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
 
     except Exception as e:
@@ -90,9 +91,19 @@ def valutazione():
 
 try:
     
+    st.title("Matching CV")
+
     if st.session_state['delay'] == None or st.session_state['delay'] == '':
         st.session_state['delay'] = 1
     
+    llm_helper = LLMHelper()
+    cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
+    df = pd.DataFrame(cv_urls)
+    df = df.sort_values(by=['matching'], ascending=False)
+    st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
+    st.write('')
+    st.write('')
+
     sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
 Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
 e deve conoscere il framework JUnit e Selenium

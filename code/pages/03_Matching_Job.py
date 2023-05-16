@@ -90,7 +90,16 @@ def valutazione():
         print(error_string)
 
 try:
-    
+    st.title("Matching Job")
+
+    llm_helper = LLMHelper()
+    cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-jd")
+    df = pd.DataFrame(cv_urls)
+    df = df.sort_values(by=['matching'], ascending=False)
+    st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
+    st.write('')
+    st.write('')
+
     if st.session_state['delay'] == None or st.session_state['delay'] == '':
         st.session_state['delay'] = 1
 

@@ -9,6 +9,8 @@ from urllib import parse
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 try:
+    st.title("Aggiunta CV e Job Description")
+    st.markdown("In questa pagina è possibile caricare nuovi CV e nuove Job Description. I documenti verranno caricati su Azure Blob Storage.")    
     
     llm_helper = LLMHelper()
 
