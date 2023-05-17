@@ -20,11 +20,12 @@ def valutazione():
         llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job Description
         ###
         {jd}
-        ###estrai tutte i requisiti richiesti e mostrale riga per riga, non aggregare i requisiti in singole righe.
-        Non includere niente altro nella risposta, non usare punti elenco. 
-        Non prendere in considerazione gli anni di esperienza richiesti. 
-        Non includere righe vuote nella risposta.
+        ###
         
+        Estrai tutte i requisiti richiesti e mostrali riga per riga, non aggregare i requisiti in singole righe.
+        Non prendere in considerazione gli anni di esperienza richiesti. 
+        Non includere niente altro nella risposta, non usare punti elenco.
+        Non includere righe vuote nella risposta.        
         """)
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
@@ -69,7 +70,8 @@ def valutazione():
                     è presente il seguente requisito:
                     {skill}
 
-                    Non considerare gli anni di esperienze richiesti se presenti. Rispondi solo con True o False senza aggiungere altro alla risposta
+                    Non considerare gli anni di esperienze richiesti se presenti. 
+                    Rispondi solo con True o False senza aggiungere altro alla risposta
                     """
                     llm_match_text = llm_helper.get_completion(question)
 
