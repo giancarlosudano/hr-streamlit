@@ -69,13 +69,12 @@ def valutazione():
                 """
 
                 llm_match_text = llm_helper.get_completion(question)
-
-                st.markdown(f"skill {skill} GPT response **{llm_match_text}**")
-
-                if bool(llm_match_text.strip()):
+                ll_match_text_clean = llm_match_text.strip().lower()
+                
+                if ll_match_text_clean == 'true':
                     matching_count = matching_count + 1
-
-                st.markdown(f"Matching {matching_count}")
+                  
+                st.markdown(f"**Requisito:** :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}") 
 
             jd_url['matching'] = matching_count
 

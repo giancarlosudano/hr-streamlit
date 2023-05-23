@@ -51,7 +51,7 @@ def valutazione():
                 duration = end_time_cv - start_time_cv
                 cv = results[0]
                 
-                exp = st.expander(f"Documento {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
+                exp = st.expander(f"CV {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
                 with exp:
                     st.markdown(cv)
 
@@ -59,28 +59,29 @@ def valutazione():
                 delay = int(st.session_state['delay'])
 
                 for skill in llm_skills:
-                    st.markdown(f"CV {cv_url['file']} Waiting {delay} sec...")
                     time.sleep(delay)
 
                     question = f"""
                     Verifica se nel seguente CV:
-                    ###
+                    ###CV
                     {cv}
                     ###
-                    è presente il seguente requisito:
+                    
+                    è presente la seguente conoscenza o esperienza:
                     {skill}
 
-                    Non considerare gli anni di esperienze richiesti se presenti. 
-                    Rispondi solo con True o False senza aggiungere altro alla risposta
+                    Nel rispondere, non considerare gli anni di esperienze richiesti se presenti. 
+                    Rispondi solo con True o False
+                    
                     """
+                    
                     llm_match_text = llm_helper.get_completion(question)
-
-                    st.markdown(f"**Skill:** {skill} (GPT response **{llm_match_text.strip()}**)")
-
-                    if llm_match_text.strip().lower() == 'true':
+                    ll_match_text_clean = llm_match_text.strip().lower()
+                    
+                    if ll_match_text_clean == 'true':
                         matching_count = matching_count + 1
 
-                    st.markdown(f"Matching {matching_count}")
+                    st.markdown(f"**Requisito:** :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}")
 
                 cv_url['matching'] = matching_count
 
@@ -90,6 +91,7 @@ def valutazione():
 
         df = pd.DataFrame(cv_urls)
         df = df.sort_values(by=['matching'], ascending=False)
+        
         st.write('')
         st.markdown('## Risultati Matching CV')
         st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)

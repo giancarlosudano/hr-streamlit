@@ -37,7 +37,6 @@ try:
     col1, col2, col3 = st.columns([1,2,1])
     with col1:
         st.image(os.path.join('images','isp.png'))
-
     with col3:
         st.button("Controllo Deployment", on_click=check_deployment)
 
