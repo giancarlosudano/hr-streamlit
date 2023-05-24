@@ -78,8 +78,9 @@ def valutazione():
                     llm_match_text = llm_helper.get_completion(question)
                     ll_match_text_clean = llm_match_text.strip().lower()
                     
-                    if ll_match_text_clean == 'true':
+                    if 'true' in ll_match_text_clean:
                         matching_count = matching_count + 1
+                        cv_url['found'] += skill + ' ----- '
 
                     st.markdown(f"**Requisito:** :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}")
 

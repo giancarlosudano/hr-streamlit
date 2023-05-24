@@ -11,14 +11,18 @@ import pandas as pd
 def valutazione(cv_urls, jd_urls):
     llm_helper = LLMHelper()
     form_client = AzureFormRecognizerClient()
+    
     for cv_url in cv_urls:
         try:
             st.header(f"Matching per CV {cv_url['file']}")
+            
+            # Apertura CV da PDF
             start_time_cv = time.perf_counter()
             cv = form_client.analyze_read(cv_url['fullpath'])[0]
             end_time_cv = time.perf_counter()
             duration = end_time_cv - start_time_cv
             
+            # Estrazione skill dal CV
             start_time_gpt = time.perf_counter()
             llm_skills_text = llm_helper.get_completion(f"""Dal seguente CV
             ###
@@ -37,10 +41,13 @@ def valutazione(cv_urls, jd_urls):
                     llm_skills.remove(skill)
 
             st.dataframe(llm_skills, use_container_width=True)
-
+            
+            
+            # Inizio match con Job Description
             st.subheader("Inizio Match con Job Description")
             for jd_url in jd_urls:
 
+                # Apertura Job Description da PDF
                 start_time_cv = time.perf_counter()
                 results = form_client.analyze_read(jd_url['fullpath'])
                 end_time_cv = time.perf_counter()
@@ -53,7 +60,29 @@ def valutazione(cv_urls, jd_urls):
                 
                 matching_count = 0
                 delay = int(st.session_state['delay'])
+                
+                # Estrazione requisiti dalla Job Description
+                start_time_gpt = time.perf_counter()
+                llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job Description
+                ###
+                {jd}
+                ###estrai tutte i requisiti e mostrale riga per riga, non includere niente altro nella risposta, non usare punti elenco. Descrivi bene la skill anche con il numero di anni presente.
+                """)
+                end_time_gpt = time.perf_counter()
+                gpt_duration = end_time_gpt - start_time_gpt
 
+                st.markdown(f"Estrazione requisiti dalla Job Description - Risposta GPT in *{gpt_duration:.2f}*")
+
+                llm_skills = llm_skills_text.strip().split('\n')
+
+                for skill in llm_skills:
+                    if skill == "":
+                        llm_skills.remove(skill)
+
+                st.dataframe(llm_skills, use_container_width=True)
+                #-------------------------------------------------
+                
+                # Match tra requisiti e skill del candidato
                 for skill in llm_skills:
                     
                     time.sleep(delay)
@@ -72,25 +101,28 @@ def valutazione(cv_urls, jd_urls):
                     llm_match_text = llm_helper.get_completion(question)
                     ll_match_text_clean = llm_match_text.strip().lower()
 
-                    if (ll_match_text_clean == "true"):
+                    if ('true' in ll_match_text_clean):
                         matching_count = matching_count + 1
+                        jd_url['found'] += skill + ' ----- '
                         
                     st.markdown(f"Requisito: :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}")
 
                 jd_url['matching'] = matching_count
+                #-------------------------------------------------
 
             df = pd.DataFrame(jd_urls)
             df = df.sort_values(by=['matching'], ascending=False)
             
             st.subheader(f"Risultato Matching per CV {cv_url['file']}")
             st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
-            st.write('')
-            st.write('')
-
+            
         except Exception as e:
             error_string = traceback.format_exc() 
             st.error(error_string)
             print(error_string)
+    
+    st.success(f"Fine Elaborazione")
+    st.write('\n\n\n\n\n\n\n\n\n')
 
 try:
     st.title("Matching Job (Tutti)")

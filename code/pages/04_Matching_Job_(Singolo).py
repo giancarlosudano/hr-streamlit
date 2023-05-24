@@ -10,8 +10,6 @@ import json
 import pandas as pd
 
 def valutazione():
-    # Check if the deployment is working
-    #\ 1. Check if the llm is working
     try:
 
         llm_helper = LLMHelper()
@@ -51,6 +49,27 @@ def valutazione():
                 st.markdown(jd)
 
             matching_count = 0
+            
+            # Estrazione skill dalla Job Description
+            start_time_gpt = time.perf_counter()
+            llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job description
+            ###
+            {jd}
+            ###estrai tutte i requisiti che il candidato deve avere e mostrale riga per riga, non includere niente altro nella risposta, non usare punti elenco. Descrivi bene la skill anche con il numero di anni presente.
+            """)
+            end_time_gpt = time.perf_counter()
+            gpt_duration = end_time_gpt - start_time_gpt
+
+            st.markdown(f"Estrazione richieste dalla job description - Risposta GPT in *{gpt_duration:.2f}*")
+
+            llm_skills = llm_skills_text.strip().split('\n')
+
+            for skill in llm_skills:
+                if skill == "":
+                    llm_skills.remove(skill)
+
+            st.dataframe(llm_skills, use_container_width=True)
+            
             delay = int(st.session_state['delay'])
 
             for skill in llm_skills:
@@ -71,8 +90,9 @@ def valutazione():
                 llm_match_text = llm_helper.get_completion(question)
                 ll_match_text_clean = llm_match_text.strip().lower()
                 
-                if ll_match_text_clean == 'true':
+                if 'true' in ll_match_text_clean:
                     matching_count = matching_count + 1
+                    jd_url['found'] += skill + ' ----- '
                   
                 st.markdown(f"**Requisito:** :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}") 
 

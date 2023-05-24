@@ -69,6 +69,7 @@ class AzureBlobStorageClient:
             urls.append({
                 "file" : blob.name,
                 "matching" : 0,
+                "found" : '',
                 "fullpath": link
                 })
         return urls
