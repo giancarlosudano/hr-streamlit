@@ -10,35 +10,36 @@ import json
 import pandas as pd
 
 def valutazione():
-    # Check if the deployment is working
-    #\ 1. Check if the llm is working
     try:
 
-        llm_helper = LLMHelper()
+        llm_helper = LLMHelper(temperature=0)
 
         start_time_gpt = time.perf_counter()
-        llm_skills_text = llm_helper.get_completion(f"""Dalla seguente Job Description
+        
+        llm_skills_text = llm_helper.get_hr_completion(f"""Fai una analisi accurata della Job Description delimitata da ###
+        Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
+        non aggregare le competenze che trovi aggregate in singole righe 
+        Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi con chiave "skill" e valore "description" 
+  
+        La job description è la seguente:      
         ###
         {jd}
         ###
         
-        Estrai tutte i requisiti richiesti e mostrali riga per riga, non aggregare i requisiti in singole righe.
-        Non prendere in considerazione gli anni di esperienza richiesti. 
-        Non includere niente altro nella risposta, non usare punti elenco.
-        Non includere righe vuote nella risposta.        
-        """)
+        Risposta:\n""")
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
 
-        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*")
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
+        st.markdown(llm_skills_text)
+        
+        inizio_json = llm_skills_text.index('{')
+        fine_json = llm_skills_text.rindex('}') + 1
 
-        llm_skills = llm_skills_text.strip().split('\n')
-
-        for skill in llm_skills:
-            if skill == "":
-                llm_skills.remove(skill)
-
-        st.dataframe(llm_skills, use_container_width=True)
+        json_string = llm_skills_text[inizio_json:fine_json]
+        json_data = json.loads(json_string)
+        
+        st.json(json_data)
         
         cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
         form_client = AzureFormRecognizerClient()
@@ -57,33 +58,42 @@ def valutazione():
 
                 matching_count = 0
                 delay = int(st.session_state['delay'])
-
-                for skill in llm_skills:
+                
+                for competenza in json_data["competenze"]:
                     time.sleep(delay)
-
+                    skill = competenza["skill"]
+                    description = competenza["description"]
+                    
                     question = f"""
-                    Verifica se nel seguente CV:
-                    ###CV
+                    Verifica se nel seguente CV delimitato da ###
+                    è presente la seguente conoscenza o esperienza:
+                    {skill}: {description}
+
+                    Mostra il ragionamento step by step e fai vedere come hai trovato la risposta. 
+                    Dopo aver mostrato il ragionamento mostra la risposta finale True o False tra parentesi quadre.
+
+                    il CV è il seguente:
+                    ###
                     {cv}
                     ###
                     
-                    è presente la seguente conoscenza o esperienza:
-                    {skill}
-
-                    Nel rispondere, non considerare gli anni di esperienze richiesti se presenti. 
-                    Rispondi solo con True o False
+                    Esempio di risposta:
                     
+                    Ragionamento: 'inserire qui il ragionamento passo passo'
+                    Risposta: [True] o [False]
                     """
-                    
-                    llm_match_text = llm_helper.get_completion(question)
-                    ll_match_text_clean = llm_match_text.strip().lower()
-                    
-                    if 'true' in ll_match_text_clean:
+                                        
+                    llm_match_text = llm_helper.get_hr_completion(question)
+                                      
+                    if '[true]' in llm_match_text.lower():
                         matching_count = matching_count + 1
                         cv_url['found'] += skill + ' ----- '
 
-                    st.markdown(f"**Requisito:** :blue[{skill}] \n(GPT response **{llm_match_text.strip()}**) - Matching Count: {matching_count}")
-
+                    st.markdown(f"Requisito: :blue[{skill}: {description}]")
+                    st.markdown("Risposta GPT: ")
+                    st.markdown(f"{llm_match_text}")
+                    st.markdown(f"**Matching Count: {matching_count}**")
+                    
                 cv_url['matching'] = matching_count
 
             except Exception as e:
@@ -119,7 +129,7 @@ try:
 
     sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
 Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
-e deve conoscere il framework JUnit e Selenium
+e deve conoscere il framework JUnit e Selenium. Conoscenza dei DB
     """
 
     jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",

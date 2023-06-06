@@ -20,6 +20,14 @@ from langchain.document_loaders.base import BaseLoader
 from langchain.document_loaders import TextLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.chat_models import ChatOpenAI
+from langchain import PromptTemplate, LLMChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
 
 from utilities.AzureFormRecognizerClient import AzureFormRecognizerClient
 from utilities.AzureBlobStorageClient import AzureBlobStorageClient
@@ -27,7 +35,6 @@ from utilities.customprompt import PROMPT
 
 import pandas as pd
 import urllib
-
 from fake_useragent import UserAgent
 
 class LLMHelper:
@@ -108,3 +115,10 @@ class LLMHelper:
             return self.llm([HumanMessage(content=prompt)]).content
         else:
             return self.llm(prompt)
+
+    def get_hr_completion(self, prompt: str):
+        messages = [
+            SystemMessage(content="Sei un'assistente virtuale che lavora nella divisione Human Resources di una grande azienda e aiuta a fare analisi di Curruculum Vitae (CV) e Job Description (JD). Aiuti ad estrarre informazioni come le competenze richieste dalle job description per fare match con quelle espresse nei CV"),
+            HumanMessage(content=prompt)]
+        return self.llm(messages).content
+        

@@ -10,8 +10,6 @@ try:
     st.title("Aggiunta CV e Job Description")
     st.markdown("In questa pagina è possibile caricare nuovi CV e nuove Job Description. I documenti verranno caricati su Azure Blob Storage.")    
     
-    llm_helper = LLMHelper()
-
     with st.expander("Caricare un nuovo CV", expanded=True):
         uploaded_cv = st.file_uploader("Caricamento Nuovo Documento", type=['txt', 'pdf'], key=1)
         if uploaded_cv is not None:
