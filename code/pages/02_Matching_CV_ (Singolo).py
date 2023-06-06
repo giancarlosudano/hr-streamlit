@@ -12,16 +12,17 @@ import pandas as pd
 def valutazione():
     try:
 
-        llm_helper = LLMHelper(temperature=0)
+        llm_helper = LLMHelper(temperature=0, max_tokens=1500)
 
         start_time_gpt = time.perf_counter()
         
         llm_skills_text = llm_helper.get_hr_completion(f"""Fai una analisi accurata della Job Description delimitata da ###
         Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
-        non aggregare le competenze che trovi aggregate in singole righe 
-        Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi con chiave "skill" e valore "description" 
+        non aggregare le competenze che trovi aggregate in singole righe
+        Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale
+        Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
   
-        La job description è la seguente:      
+        La job description è la seguente:
         ###
         {jd}
         ###
@@ -82,7 +83,7 @@ def valutazione():
                     Ragionamento: 'inserire qui il ragionamento passo passo'
                     Risposta: [True] o [False]
                     """
-                                        
+                                   
                     llm_match_text = llm_helper.get_hr_completion(question)
                                       
                     if '[true]' in llm_match_text.lower():
@@ -117,7 +118,7 @@ try:
     st.title("Matching CV")
 
     if st.session_state['delay'] == None or st.session_state['delay'] == '':
-        st.session_state['delay'] = 1
+        st.session_state['delay'] = 0
     
     llm_helper = LLMHelper()
     cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
@@ -135,7 +136,7 @@ e deve conoscere il framework JUnit e Selenium. Conoscenza dei DB
     jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
                       value=sample, height=300)
 
-    st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 90, st.session_state['delay'])
+    st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 5, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)
 
     result_placeholder = st.empty()
