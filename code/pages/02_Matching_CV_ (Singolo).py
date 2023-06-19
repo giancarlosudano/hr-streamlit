@@ -19,9 +19,10 @@ def valutazione():
         llm_skills_text = llm_helper.get_hr_completion(f"""Fai una analisi accurata della Job Description delimitata da ###
         Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
         non aggregare le competenze che trovi aggregate in singole righe
-        Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale
+        Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale. 
         Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
-  
+        Se in una competenza richiesta trovi una lista come ad esempio: "Conoscenza di DB SQL e NO SQL" crea più competenze separate per ogni voce della lista nel file json
+        
         La job description è la seguente:
         ###
         {jd}
@@ -66,27 +67,31 @@ def valutazione():
                     description = competenza["description"]
                     
                     question = f"""
-                    Verifica se nel seguente CV delimitato da ###
-                    è presente la seguente conoscenza o esperienza:
-                    {skill}: {description}
-
-                    Mostra il ragionamento step by step e fai vedere come hai trovato la risposta. 
-                    Dopo aver mostrato il ragionamento mostra la risposta finale True o False tra parentesi quadre.
+                    Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
+                    Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
+                    Mostra il ragionamento step by step che ti ha portato alla risposta.                     
+                    Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
 
                     il CV è il seguente:
                     ###
                     {cv}
                     ###
                     
+                    la competenza da cercare è:
+                    ---
+                    {skill}: {description}
+                    ---
+                    
                     Esempio di risposta:
                     
-                    Ragionamento: 'inserire qui il ragionamento passo passo'
+                    Ragionamento: 'inserisci qui il tuo ragionamento'
                     Risposta: [True] o [False]
                     """
                                    
                     llm_match_text = llm_helper.get_hr_completion(question)
-                                      
-                    if '[true]' in llm_match_text.lower():
+                    
+                    # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
+                    if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
                         matching_count = matching_count + 1
                         cv_url['found'] += skill + ' ----- '
 
@@ -98,7 +103,7 @@ def valutazione():
                 cv_url['matching'] = matching_count
 
             except Exception as e:
-                error_string = traceback.format_exc() 
+                error_string = traceback.format_exc()
                 st.error(error_string)
 
         df = pd.DataFrame(cv_urls)
@@ -128,11 +133,104 @@ try:
     st.write('')
     st.write('')
 
-    sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
-Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
-e deve conoscere il framework JUnit e Selenium. Conoscenza dei DB
-    """
+    sample = """Qualifica: 
+Software Engineer ambito Dati e Aree di Governo
+Intesa Sanpaolo è un gruppo bancario internazionale, leader in Italia e fra i primi 5 gruppi dell'area euro con
+oltre 20 milioni di clienti in Italia e all’estero. Estremamente innovativo è anche motore di crescita sostenibile e
+inclusiva, con impatto concreto sulla società e con un forte impegno per l’ambiente.
 
+Scopo e attività:
+Siamo alla ricerca di persone con competenze in ambito IT e specializzazione sulle tematiche legate al risk
+management in ambito bancario, che sappiano gestire la complessità con sicurezza e fiducia mantenendo un
+approccio challenge alle sfide, sviluppando sinergie e inclusione.
+La figura ricercata, in qualità di SOFTWARE ENGINEER dovrà progettare e sviluppare software applicativi e
+componenti dati a supporto di sistemi software, massimizzandone la qualità e la performance nel rispetto delle
+specifiche tecniche e funzionali definite; il candidato lavorerà a stretto contatto con il team progettuale e
+funzionale dell’ambito applicativo di riferimento, supportandoli nella scelta delle migliori opzioni tecnologiche al
+fine di rendere efficienti e stabili gli ambiti applicativi.
+Il contesto specifico sarà fortemente innovativo, consentendo di operare su piattaforme Cloud native,
+principalmente in approccio Agile.
+Nello specifico il candidato sarà inserito all’interno della Direzione Sistemi Informativi del Gruppo Intesa
+Sanpaolo, all’interno di una unità dell’ambito Risk Management.
+Le principali attività:
+Progettazione e sviluppo dei software applicativi e delle basi dati relative
+Gestione della relazione con altri membri team interno ed esterno di sviluppo
+Collaborazione con il Project Manager per la definizione dello Stato Avanzamento Lavori,
+identificazione e indirizzamento delle criticità, identificazione e gestione proattiva dei rischi di progetto
+Mantenimento della coerenza tra quanto sviluppato e gli standard / normativa aziendale con riferimento,
+per esempio Privacy, Change Management e al Data Management/Data Quality 
+expetech
+Esperienza Richiesta:
+3-5 anni di esperienza in progetti IT a medio/alta complessità preferibilmente nel contesto digitale bancario,
+finanziario o settore creditizio
+Qualifiche Richieste, Skills e Competenze
+Laurea o diploma specialistico ad indirizzo informatico-scientifico (informatica, matematica, fisica,
+ingegneria informatica)
+Buona padronanza della lingua inglese
+Ottima conoscenza degli strumenti del pacchetto Office 365
+Concorre a titolo preferenziale la conoscenza:
+dei sistemi informativi in ambito bancario in generale
+dei sistemi informativi atti alla gestione del Risk Management
+Conoscenza dei principali sistemi operativi
+Conoscenza dei principali DB SQL e NOSQL
+Esperienza in progetti con utilizzo di almeno uno dei seguenti DBMS: Google Big Query/Teradata/PostgreSQL
+Esperienza di sviluppo su almeno uno dei seguenti linguaggi di programmazione Python, R, SAS
+Preferibile conoscenza ed esperienza di sviluppo con i linguaggi Spark/PY-Spark/Julia / Rust
+Conoscenza/ Utilizzo degli strumenti nativi della piattaforma Google Cloud (BigQuery, Looker, ..)
+Conoscenza delle tecnologie di data transformation (ETL) e di data communication
+Conoscenza Java (framework Spring)
+Conoscenza del sistema di versionamento git
+Conoscenza della metodologia di sviluppo Agile Scrum
+"""
+
+    sample = """Qualifica: Senior Functional Analyst ambito Dati e Aree di Governo
+Intesa Sanpaolo è un gruppo bancario internazionale, leader in Italia e fra i primi 5 gruppi dell'area euro con
+oltre 20 milioni di clienti in Italia e all’estero. Estremamente innovativo è anche motore di crescita sostenibile e
+inclusiva, con impatto concreto sulla società e con un forte impegno per l’ambiente.
+Scopo e Attività
+Siamo alla ricerca di persone con competenze in ambito IT e specializzazione sulle tematiche legate alla
+contabilità in ambito bancario, che sappiano gestire la complessità con sicurezza e fiducia mantenendo un
+approccio challenge alle sfide, sviluppando sinergie e inclusione.
+La figura ricercata, in qualità di SENIOR FUNCTIONAL ANALYST, dovrà recepire, analizzare e tradurre i
+business requirements relativi all’ambito di riferimento attraverso la formalizzazione delle specifiche e dei
+requisiti funzionali per quanto riguarda le
+componenti tecniche e tecnologiche.
+Nello specifico il candidato sarà inserito all’interno della Direzione Sistemi Informativi del Gruppo Intesa
+Sanpaolo in una unità dell’ambito Risk Management.
+Le principali attività consisteranno in:
+Analizzare, progettare e/o reingegnerizzare i processi di business interni valutandone la fattibilità, i
+rischi e gli impatti sulle soluzioni IT esistenti oppure individuando nuove soluzioni
+Condurre l’analisi dei requisiti di Business necessaria allo sviluppo di nuove soluzioni IT e al
+miglioramento di quelle esistenti curando la relazione con il business owner banca
+Redigere il documento di analisi funzionale in conformità con i requisiti espressi
+Verificare e garantire la correttezza funzionale dei processi e delle soluzioni IT aziendali
+Collaborare a stretto contatto con il team di progetto, in particolare con il team di sviluppo IT affinché
+vengano comprese le esigenze dell’utente e vengano sviluppate nel modo corretto
+Curare la progettazione, documentazione e coordinamento dei collaudi delle soluzioni IT, supportando
+gli utenti e validando il processo di test end-to-end
+Supportare il responsabile di riferimento nelle varie fasi del ciclo di vita del software curando le attività
+di reporting dello stato di avanzamento lavori
+expetech
+Esperienza Richiesta
+Almeno 5 anni di esperienza in progetti IT a medio/alta complessità preferibilmente nel contesto bancario,
+finanziario o settore creditizio
+Qualifiche Richieste, Skills
+Laurea o diploma specialistico ad indirizzo informatico-scientifico (matematica, fisica, ingegneria
+informatica)
+Buona padronanza della lingua inglese
+Ottima conoscenza degli strumenti del pacchetto Office 365
+Comprovata esperienza in progetti di alta complessità in qualità di analista funzionale
+Conoscenza approfondita delle fasi progettuali in ambito IT (analisi dei requisiti di business,
+declinazione in analisi funzionale, etc) e delle metodologie di stima
+Esperienza significativa in progetti IT con utilizzo dei principali DB SQL e NOSQL
+Esperienza in progetti con utilizzo di ambienti Cloud
+Esperienza significativa in progetti IT con applicazione delle metodologie di sviluppo Agile Scrum
+Esperienza in progetti IT con utilizzo dei linguaggi di programmazione Python/R
+Esperienza in progetti IT con utilizzo del framework SAS
+Concorre a titolo preferenziale la conoscenza:
+dei sistemi informativi in ambito bancario in generale
+dei sistemi informativi atti alla gestione del Risk Management
+"""
     jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
                       value=sample, height=300)
 
