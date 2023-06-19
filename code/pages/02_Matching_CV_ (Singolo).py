@@ -133,55 +133,10 @@ try:
     st.write('')
     st.write('')
 
-    sample = """Qualifica: 
-Software Engineer ambito Dati e Aree di Governo
-Intesa Sanpaolo è un gruppo bancario internazionale, leader in Italia e fra i primi 5 gruppi dell'area euro con
-oltre 20 milioni di clienti in Italia e all’estero. Estremamente innovativo è anche motore di crescita sostenibile e
-inclusiva, con impatto concreto sulla società e con un forte impegno per l’ambiente.
-
-Scopo e attività:
-Siamo alla ricerca di persone con competenze in ambito IT e specializzazione sulle tematiche legate al risk
-management in ambito bancario, che sappiano gestire la complessità con sicurezza e fiducia mantenendo un
-approccio challenge alle sfide, sviluppando sinergie e inclusione.
-La figura ricercata, in qualità di SOFTWARE ENGINEER dovrà progettare e sviluppare software applicativi e
-componenti dati a supporto di sistemi software, massimizzandone la qualità e la performance nel rispetto delle
-specifiche tecniche e funzionali definite; il candidato lavorerà a stretto contatto con il team progettuale e
-funzionale dell’ambito applicativo di riferimento, supportandoli nella scelta delle migliori opzioni tecnologiche al
-fine di rendere efficienti e stabili gli ambiti applicativi.
-Il contesto specifico sarà fortemente innovativo, consentendo di operare su piattaforme Cloud native,
-principalmente in approccio Agile.
-Nello specifico il candidato sarà inserito all’interno della Direzione Sistemi Informativi del Gruppo Intesa
-Sanpaolo, all’interno di una unità dell’ambito Risk Management.
-Le principali attività:
-Progettazione e sviluppo dei software applicativi e delle basi dati relative
-Gestione della relazione con altri membri team interno ed esterno di sviluppo
-Collaborazione con il Project Manager per la definizione dello Stato Avanzamento Lavori,
-identificazione e indirizzamento delle criticità, identificazione e gestione proattiva dei rischi di progetto
-Mantenimento della coerenza tra quanto sviluppato e gli standard / normativa aziendale con riferimento,
-per esempio Privacy, Change Management e al Data Management/Data Quality 
-expetech
-Esperienza Richiesta:
-3-5 anni di esperienza in progetti IT a medio/alta complessità preferibilmente nel contesto digitale bancario,
-finanziario o settore creditizio
-Qualifiche Richieste, Skills e Competenze
-Laurea o diploma specialistico ad indirizzo informatico-scientifico (informatica, matematica, fisica,
-ingegneria informatica)
-Buona padronanza della lingua inglese
-Ottima conoscenza degli strumenti del pacchetto Office 365
-Concorre a titolo preferenziale la conoscenza:
-dei sistemi informativi in ambito bancario in generale
-dei sistemi informativi atti alla gestione del Risk Management
-Conoscenza dei principali sistemi operativi
-Conoscenza dei principali DB SQL e NOSQL
-Esperienza in progetti con utilizzo di almeno uno dei seguenti DBMS: Google Big Query/Teradata/PostgreSQL
-Esperienza di sviluppo su almeno uno dei seguenti linguaggi di programmazione Python, R, SAS
-Preferibile conoscenza ed esperienza di sviluppo con i linguaggi Spark/PY-Spark/Julia / Rust
-Conoscenza/ Utilizzo degli strumenti nativi della piattaforma Google Cloud (BigQuery, Looker, ..)
-Conoscenza delle tecnologie di data transformation (ETL) e di data communication
-Conoscenza Java (framework Spring)
-Conoscenza del sistema di versionamento git
-Conoscenza della metodologia di sviluppo Agile Scrum
-"""
+    sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
+Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
+e deve conoscere il framework JUnit e Selenium. Conoscenza dei DB
+    """
 
     sample = """Qualifica: Senior Functional Analyst ambito Dati e Aree di Governo
 Intesa Sanpaolo è un gruppo bancario internazionale, leader in Italia e fra i primi 5 gruppi dell'area euro con
