@@ -15,9 +15,13 @@ def valutazione():
         llm_helper = LLMHelper(temperature=0, max_tokens=1500)
 
         start_time_gpt = time.perf_counter()
+
+        print("Prompt Estrazione:")
+        print(st.session_state["prompt_estrazione"])
+        print("JD:")
+        print(st.session_state["jd"])
         
-        jd = st.session_state["jd"]
-        llm_skills_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione"].format(jd))
+        llm_skills_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione"].format(jd = st.session_state["jd"]))
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
 
@@ -32,7 +36,9 @@ def valutazione():
         
         st.json(json_data)
         
-        cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
+        container = st.session_state["container"] 
+        cv_urls = llm_helper.blob_client.get_all_urls(container_name=container)
+        
         form_client = AzureFormRecognizerClient()
 
         for cv_url in cv_urls:
@@ -55,7 +61,7 @@ def valutazione():
                     skill = competenza["skill"]
                     description = competenza["description"]
                     
-                    llm_match_text = llm_helper.get_hr_completion(prompt_confronto.format(cv).format(skill).format(description))
+                    llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_confronto"].format(cv = cv, skill = skill, description = description))
                     
                     # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
                     if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
@@ -87,7 +93,7 @@ def valutazione():
 
 try:
     
-    prompt_estrazione = """Fai una analisi accurata della Job Description delimitata da ###
+    prompt_estrazione_default = """Fai una analisi accurata della Job Description delimitata da ###
 Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
 non aggregare le competenze che trovi aggregate in singole righe
 Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale. 
@@ -101,7 +107,7 @@ La job description è la seguente:
 
 Risposta:\n"""
 
-    prompt_confronto = """
+    prompt_confronto_default = """
 Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
 Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
 Mostra il ragionamento step by step che ti ha portato alla risposta.                     
@@ -125,7 +131,7 @@ Risposta: [True] o [False]
 
     container_default = "cv1"
     
-    jd = """La figura ricercata, in qualità di TEST AND RELEASE MANAGER, dovrà contribuire alla definizione del pianodei rilasci applicativi, verificando conflitti di pianificazione, ottimizzando l’uso degli ambienti di test,garantendone il rispetto degli standard e delle procedure in materia change management e gestendo i rischiinformatici e i processi che ne regolano l’attività.
+    jd_default = """La figura ricercata, in qualità di TEST AND RELEASE MANAGER, dovrà contribuire alla definizione del pianodei rilasci applicativi, verificando conflitti di pianificazione, ottimizzando l’uso degli ambienti di test,garantendone il rispetto degli standard e delle procedure in materia change management e gestendo i rischiinformatici e i processi che ne regolano l’attività.
 Dovrà inoltre gestire e governare le attività di test nell’ambito progettuale di riferimento, per i sistemi IT o per irequisiti di usabilità del cliente, garantendo il rispetto delle metodologie e standard aziendali e gestendo lerisorse nel rispetto dei tempi, dei costi e requisiti
 condivisi.
 Lavorerai all’interno della Direzione Sistemi Informativi del Gruppo Intesa Sanpaolo in ambito RiskManagement e progetterai e gestirai i processi di test e quality assurance.
@@ -154,36 +160,15 @@ Conoscenza dello strumento ALM
     st.title("Matching CV")
 
     if st.session_state['delay'] is None or st.session_state['delay'] == '':
-        st.session_state['delay'] = 0
+        st.session_state['delay'] = 1
     
     llm_helper = LLMHelper()
-    cv_urls = llm_helper.blob_client.get_all_urls(container_name="documents-cv")
-    df = pd.DataFrame(cv_urls)
-    df = df.sort_values(by=['matching'], ascending=False)
-    st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
-    st.write('')
-    st.write('')
-     
-    # if st.session_state["prompt_estrazione"] == None or st.session_state["prompt_estrazione"] == '': 
-    #     st.session_state["prompt_estrazione"] = prompt_estrazione
-    
-    # if st.session_state["prompt_confronto"] == None or st.session_state["prompt_confronto"] == '': 
-    #     st.session_state["prompt_confronto"] = prompt_confronto
-
-    # if st.session_state["container"] == None or st.session_state["container"] == '':
-    #     st.session_state["container"] = "cv1"
-        
-    # if st.session_state["jd"] == None or st.session_state["jd"] == '':
-    #     st.session_state["jd"] = jd
-        
-    # if st.session_state["container"] == None or st.session_state["container"] == '':
-    #     st.session_state["container"] = "cv1"
         
     st.session_state["container"] = st.text_input(label = "Nome della cartella dei CV sullo storage:", value=container_default)
     st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=400)
     st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
     
-    st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd, height=300)
+    st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd_default, height=300)
 
     st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 5, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)
