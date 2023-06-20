@@ -27,14 +27,14 @@ def check_deployment():
 try:
     StreamlitHelper.hide_footer()
 
-    st.title("Leonardo Rapid Protype - HR Assistant Open AI")
+    st.title("HR Assistant Open AI")
     
     llm_helper = LLMHelper()
 
     col1, col2, col3 = st.columns([1,2,1])
     with col1:
         st.write("")
-        # st.image(os.path.join('images','isp.png'))
+        st.image(os.path.join('images','isp.png'))
     with col3:
         st.button("Controllo Deployment", on_click=check_deployment)
 
@@ -46,41 +46,15 @@ try:
     st.session_state["token_response"] = st.slider("Tokens response length", 100, 1500, 1000)
     st.session_state["temperature"] = st.slider("Temperature", 0.0, 1.0, 0.0)
     st.session_state['delay'] = st.slider("Delay for any call in iterations", 0, 15, 0)
-
-    st.text_area("Prompt Estrazione Competenze", key="extraction", height=300, value="""Fai una analisi accurata della Job Description delimitata da ###
-Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
-non aggregare le competenze che trovi aggregate in singole righe
-Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale
-Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
-
-La job description è la seguente:
-###
-{jd}
-###""")
-    
-    st.text_area("Prompt Ricerca Corrispondenze", key="match", height=300, value="""
-Verifica se nel seguente CV delimitato da ###
-è presente la seguente conoscenza o esperienza:
-{skill}
-
-Mostra il ragionamento step by step e fai vedere come hai trovato la risposta. 
-Dopo aver mostrato il ragionamento mostra la risposta finale True o False tra parentesi quadre.
-
-il CV è il seguente:
-###
-{cv}
-###
-
-Esempio di risposta:
-
-Ragionamento: 'inserire qui il ragionamento passo passo'
-Risposta: [True] o [False]
-""")
-
     st.session_state['top_p'] = st.slider("Top P", 0.0, 1.0, 0.9)
     st.session_state['frequency_penalty'] = st.slider("Frequency Penalty", 0.0, 1.0, 0.0)
     st.session_state['presence_penalty'] = st.slider("Presence Penalty", 0.0, 1.0, 0.6)
     st.session_state['best_of'] = st.slider("Best of", 1, 10, 1)
+    
+    st.session_state["prompt_estrazione"] = ""
+    st.session_state["prompt_confronto"] = ""
+    st.session_state["container"] = "cv01"
+    st.session_state["jd"] = ""
     
 except Exception:
     st.error(traceback.format_exc())

@@ -11,24 +11,13 @@ import pandas as pd
 
 def valutazione():
     try:
-
+        
         llm_helper = LLMHelper(temperature=0, max_tokens=1500)
 
         start_time_gpt = time.perf_counter()
         
-        llm_skills_text = llm_helper.get_hr_completion(f"""Fai una analisi accurata della Job Description delimitata da ###
-        Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
-        non aggregare le competenze che trovi aggregate in singole righe
-        Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale. 
-        Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
-        Se in una competenza richiesta trovi una lista come ad esempio: "Conoscenza di DB SQL e NO SQL" crea più competenze separate per ogni voce della lista nel file json
-        
-        La job description è la seguente:
-        ###
-        {jd}
-        ###
-        
-        Risposta:\n""")
+        jd = st.session_state["jd"]
+        llm_skills_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione"].format(jd))
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
 
@@ -66,29 +55,7 @@ def valutazione():
                     skill = competenza["skill"]
                     description = competenza["description"]
                     
-                    question = f"""
-                    Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
-                    Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
-                    Mostra il ragionamento step by step che ti ha portato alla risposta.                     
-                    Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
-
-                    il CV è il seguente:
-                    ###
-                    {cv}
-                    ###
-                    
-                    la competenza da cercare è:
-                    ---
-                    {skill}: {description}
-                    ---
-                    
-                    Esempio di risposta:
-                    
-                    Ragionamento: 'inserisci qui il tuo ragionamento'
-                    Risposta: [True] o [False]
-                    """
-                                   
-                    llm_match_text = llm_helper.get_hr_completion(question)
+                    llm_match_text = llm_helper.get_hr_completion(prompt_confronto.format(cv).format(skill).format(description))
                     
                     # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
                     if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
@@ -120,9 +87,73 @@ def valutazione():
 
 try:
     
+    prompt_estrazione = """Fai una analisi accurata della Job Description delimitata da ###
+Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
+non aggregare le competenze che trovi aggregate in singole righe
+Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale. 
+Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
+Se in una competenza richiesta trovi una lista come ad esempio: "Conoscenza di DB SQL e NO SQL" crea più competenze separate per ogni voce della lista nel file json
+
+La job description è la seguente:
+###
+{jd}
+###
+
+Risposta:\n"""
+
+    prompt_confronto = """
+Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
+Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
+Mostra il ragionamento step by step che ti ha portato alla risposta.                     
+Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
+
+il CV è il seguente:
+###
+{cv}
+###
+
+la competenza da cercare è:
+---
+{skill}: {description}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]
+"""
+
+    container_default = "cv1"
+    
+    jd = """La figura ricercata, in qualità di TEST AND RELEASE MANAGER, dovrà contribuire alla definizione del pianodei rilasci applicativi, verificando conflitti di pianificazione, ottimizzando l’uso degli ambienti di test,garantendone il rispetto degli standard e delle procedure in materia change management e gestendo i rischiinformatici e i processi che ne regolano l’attività.
+Dovrà inoltre gestire e governare le attività di test nell’ambito progettuale di riferimento, per i sistemi IT o per irequisiti di usabilità del cliente, garantendo il rispetto delle metodologie e standard aziendali e gestendo lerisorse nel rispetto dei tempi, dei costi e requisiti
+condivisi.
+Lavorerai all’interno della Direzione Sistemi Informativi del Gruppo Intesa Sanpaolo in ambito RiskManagement e progetterai e gestirai i processi di test e quality assurance.
+Le principali attività:
+Gestione delle fasi di progettazione, preparazione ed esecuzione dei test tecnici e funzionali
+Coordinamento degli attori coinvolti nelle fasi di User Acceptance Test
+Collaborazione con il Project Manager e il team di progetto per la definizione dello Stato AvanzamentoLavori, identificazione e indirizzamento delle criticità, identificazione e gestione proattiva dei rischi diprogetto
+expetech
+Esperienza Richiesta
+Almeno 1-2 anni di
+esperienza in progetti IT a medio/alta complessità preferibilmente nel contesto bancario,finanziario o settore creditizio.
+Competenze
+Laurea o diploma specialistico ad indirizzo informatico-scientifico (matematica, fisica, ingegneriainformatica)
+Buona padronanza della lingua inglese
+Ottima conoscenza degli strumenti del pacchetto Office 365
+Concorre a titolo preferenziale la conoscenza:
+dei sistemi contabili in ambito bancario, finanziario o settore creditizio
+Conoscenza delle fasi progettuali in ambito IT (analisi dei requisiti di business, analisi funzionale,sviluppi, rilasci, test)
+Conoscenza delle metodologie di sviluppo Agile Scrum
+Esperienza nel ruolo di Test Manager in progetti a media/alta complessità
+Capacità di definire, organizzare e gestire il processo di Quality Assurance
+Conoscenza del sistema di versionamento GIT
+Esperienza su processo e strumenti CI/CD DevOps
+Conoscenza dello strumento ALM
+"""
     st.title("Matching CV")
 
-    if st.session_state['delay'] == None or st.session_state['delay'] == '':
+    if st.session_state['delay'] is None or st.session_state['delay'] == '':
         st.session_state['delay'] = 0
     
     llm_helper = LLMHelper()
@@ -132,62 +163,27 @@ try:
     st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
     st.write('')
     st.write('')
+     
+    # if st.session_state["prompt_estrazione"] == None or st.session_state["prompt_estrazione"] == '': 
+    #     st.session_state["prompt_estrazione"] = prompt_estrazione
+    
+    # if st.session_state["prompt_confronto"] == None or st.session_state["prompt_confronto"] == '': 
+    #     st.session_state["prompt_confronto"] = prompt_confronto
 
-    sample = """Posto di Lavoro nella società XXX come tester automation nel team DevOps
-Il candidato deve avere esperienze di programmazione in Java da almeno 2 anni
-e deve conoscere il framework JUnit e Selenium. Conoscenza dei DB
-    """
-
-    sample = """Qualifica: Senior Functional Analyst ambito Dati e Aree di Governo
-Intesa Sanpaolo è un gruppo bancario internazionale, leader in Italia e fra i primi 5 gruppi dell'area euro con
-oltre 20 milioni di clienti in Italia e all’estero. Estremamente innovativo è anche motore di crescita sostenibile e
-inclusiva, con impatto concreto sulla società e con un forte impegno per l’ambiente.
-Scopo e Attività
-Siamo alla ricerca di persone con competenze in ambito IT e specializzazione sulle tematiche legate alla
-contabilità in ambito bancario, che sappiano gestire la complessità con sicurezza e fiducia mantenendo un
-approccio challenge alle sfide, sviluppando sinergie e inclusione.
-La figura ricercata, in qualità di SENIOR FUNCTIONAL ANALYST, dovrà recepire, analizzare e tradurre i
-business requirements relativi all’ambito di riferimento attraverso la formalizzazione delle specifiche e dei
-requisiti funzionali per quanto riguarda le
-componenti tecniche e tecnologiche.
-Nello specifico il candidato sarà inserito all’interno della Direzione Sistemi Informativi del Gruppo Intesa
-Sanpaolo in una unità dell’ambito Risk Management.
-Le principali attività consisteranno in:
-Analizzare, progettare e/o reingegnerizzare i processi di business interni valutandone la fattibilità, i
-rischi e gli impatti sulle soluzioni IT esistenti oppure individuando nuove soluzioni
-Condurre l’analisi dei requisiti di Business necessaria allo sviluppo di nuove soluzioni IT e al
-miglioramento di quelle esistenti curando la relazione con il business owner banca
-Redigere il documento di analisi funzionale in conformità con i requisiti espressi
-Verificare e garantire la correttezza funzionale dei processi e delle soluzioni IT aziendali
-Collaborare a stretto contatto con il team di progetto, in particolare con il team di sviluppo IT affinché
-vengano comprese le esigenze dell’utente e vengano sviluppate nel modo corretto
-Curare la progettazione, documentazione e coordinamento dei collaudi delle soluzioni IT, supportando
-gli utenti e validando il processo di test end-to-end
-Supportare il responsabile di riferimento nelle varie fasi del ciclo di vita del software curando le attività
-di reporting dello stato di avanzamento lavori
-expetech
-Esperienza Richiesta
-Almeno 5 anni di esperienza in progetti IT a medio/alta complessità preferibilmente nel contesto bancario,
-finanziario o settore creditizio
-Qualifiche Richieste, Skills
-Laurea o diploma specialistico ad indirizzo informatico-scientifico (matematica, fisica, ingegneria
-informatica)
-Buona padronanza della lingua inglese
-Ottima conoscenza degli strumenti del pacchetto Office 365
-Comprovata esperienza in progetti di alta complessità in qualità di analista funzionale
-Conoscenza approfondita delle fasi progettuali in ambito IT (analisi dei requisiti di business,
-declinazione in analisi funzionale, etc) e delle metodologie di stima
-Esperienza significativa in progetti IT con utilizzo dei principali DB SQL e NOSQL
-Esperienza in progetti con utilizzo di ambienti Cloud
-Esperienza significativa in progetti IT con applicazione delle metodologie di sviluppo Agile Scrum
-Esperienza in progetti IT con utilizzo dei linguaggi di programmazione Python/R
-Esperienza in progetti IT con utilizzo del framework SAS
-Concorre a titolo preferenziale la conoscenza:
-dei sistemi informativi in ambito bancario in generale
-dei sistemi informativi atti alla gestione del Risk Management
-"""
-    jd = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:",
-                      value=sample, height=300)
+    # if st.session_state["container"] == None or st.session_state["container"] == '':
+    #     st.session_state["container"] = "cv1"
+        
+    # if st.session_state["jd"] == None or st.session_state["jd"] == '':
+    #     st.session_state["jd"] = jd
+        
+    # if st.session_state["container"] == None or st.session_state["container"] == '':
+    #     st.session_state["container"] = "cv1"
+        
+    st.session_state["container"] = st.text_input(label = "Nome della cartella dei CV sullo storage:", value=container_default)
+    st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=400)
+    st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
+    
+    st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd, height=300)
 
     st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 5, st.session_state['delay'])
     st.button(label="Calcola match", on_click=valutazione)
