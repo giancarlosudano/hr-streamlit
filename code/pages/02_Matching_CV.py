@@ -162,7 +162,7 @@ Conoscenza dello strumento ALM
     if st.session_state['delay'] is None or st.session_state['delay'] == '':
         st.session_state['delay'] = 1
     
-    llm_helper = LLMHelper()
+    llm_helper = LLMHelper(temperature=st.session_state['temperature'], top_p=st.session_state['top_p'])
         
     st.session_state["container"] = st.text_input(label = "Nome della cartella dei CV sullo storage:", value=container_default)
     st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=400)

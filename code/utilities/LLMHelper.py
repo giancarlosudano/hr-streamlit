@@ -69,6 +69,7 @@ class LLMHelper:
         self.deployment_type: str = os.getenv("OPENAI_DEPLOYMENT_TYPE", "Text")
         self.temperature: float = float(os.getenv("OPENAI_TEMPERATURE", 0.7)) if temperature is None else temperature
         self.max_tokens: int = int(os.getenv("OPENAI_MAX_TOKENS", -1)) if max_tokens is None else max_tokens
+        self.top_p : float = float(os.getenv("OPENAI_TOP_P", 1)) if top_p is None else top_p
         
         self.chunk_size = int(os.getenv('CHUNK_SIZE', 500))
         self.chunk_overlap = int(os.getenv('CHUNK_OVERLAP', 100))
