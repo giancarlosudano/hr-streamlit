@@ -30,10 +30,32 @@ def valutazione():
         
         inizio_json = llm_skills_text.index('{')
         fine_json = llm_skills_text.rindex('}') + 1
-
+        
         json_string = llm_skills_text[inizio_json:fine_json]
         json_data = json.loads(json_string)
         
+        st.markdown("Json estratto (iniziale):")
+        st.json(json_data)
+        
+        st.markdown(st.session_state["prompt_split"])
+        
+        input_formatted = st.session_state["prompt_split"].replace('{json_lista}', json_string)
+        st.markdown(input_formatted)
+        
+        llm_skills_splitted_text = llm_helper.get_hr_completion(input_formatted)
+        end_time_gpt = time.perf_counter()
+        gpt_duration = end_time_gpt - start_time_gpt
+
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
+        st.markdown(llm_skills_splitted_text)
+        
+        inizio_json = llm_skills_text.index('{')
+        fine_json = llm_skills_text.rindex('}') + 1
+        
+        json_string = llm_skills_text[inizio_json:fine_json]
+        json_data = json.loads(json_string)
+        
+        st.markdown("Json estratto (splitted):")
         st.json(json_data)
         
         container = st.session_state["container"] 
@@ -93,12 +115,11 @@ def valutazione():
 
 try:
     
-    prompt_estrazione_default = """Fai una analisi accurata della Job Description delimitata da ###
-Cerca tutte le competenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza
-non aggregare le competenze che trovi aggregate in singole righe
-Cerca le competenze in modo completo in tutta la Job description, non solo nella parte iniziale. 
-Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description"
-Se in una competenza richiesta trovi una lista come ad esempio: "Conoscenza di DB SQL e NO SQL" crea più competenze separate per ogni voce della lista nel file json
+    prompt_estrazione_default = """Comportati come un recruiter professionista
+Fai una analisi accurata della Job Description delimitata da ###
+Cerca tutte le competenze e conoscenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza 
+Considera il titolo di studio come una competenza
+Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description", dove skill è un nome molto breve  della competenza e description è la descrizione della competenza.
 
 La job description è la seguente:
 ###
@@ -106,6 +127,140 @@ La job description è la seguente:
 ###
 
 Risposta:\n"""
+
+    prompt_split_default = """Dato un il file json delimitato da ### con all'interno delle skill estratte da una job description precedente, 
+dovrai:
+- produrre un nuovo json identico nella struttura
+- il nuovo json deve avere le stesste skill di quello delimitato da ### e se ci sono skill che raggruppano più competenze nella stessa riga, devi separare ogni competenza.
+
+Esempio
+
+json iniziale:
+
+{
+  "competenze": [
+    {
+      "skill": "Conoscenza dei principali DB SQL e NO SQL",
+      "description": "Richiesta conoscenza dei principali database SQL."
+    },
+    {
+      "skill": "Esperienza in progetti con utilizzo di almeno uno dei seguenti DBMS: Google Big Query/Teradata/PostgreSQL",
+      "description": "Richiesta esperienza nell'utilizzo di almeno uno dei seguenti database management system: Google Big Query, Teradata o PostgreSQL."
+    },
+    {
+      "skill": "Esperienza di sviluppo su almeno uno dei seguenti linguaggi di programmazione Python, R, SAS",
+      "description": "Richiesta esperienza di sviluppo su almeno uno dei seguenti linguaggi di programmazione: Python, R o SAS."
+    },
+    {
+      "skill": "Preferibile conoscenza ed esperienza di sviluppo con i linguaggi Spark/PY-Spark/Julia / Rust",
+      "description": "Preferibile conoscenza ed esperienza di sviluppo con i linguaggi Spark, PY-Spark, Julia o Rust."
+    },
+    {
+      "skill": "Conoscenza/ Utilizzo degli strumenti nativi della piattaforma Google Cloud (BigQuery, Looker, ..)",
+      "description": "Richiesta conoscenza e utilizzo degli strumenti nativi della piattaforma Google Cloud, come BigQuery e Looker."
+    },
+    {
+      "skill": "Conoscenza delle tecnologie di data transformation (ETL) e di data communication",
+      "description": "Richiesta conoscenza delle tecnologie di data transformation (ETL) e di data communication."
+    },
+    {
+      "skill": "Conoscenza Java (framework Spring)",
+      "description": "Richiesta conoscenza del linguaggio di programmazione Java e del framework Spring."
+    },
+    {
+      "skill": "Conoscenza del sistema di versionamento git",
+      "description": "Richiesta conoscenza del sistema di versionamento git."
+    },
+    {
+      "skill": "Conoscenza della metodologia di sviluppo Agile Scrum",
+      "description": "Richiesta conoscenza della metodologia di sviluppo Agile Scrum."
+    }
+  ]
+}
+
+risposta:
+
+{
+  "competenze": [
+    {
+      "skill": "Conoscenza DB SQL",
+      "description": "Richiesta conoscenza dei principali database SQL."
+    },
+    {
+      "skill": "Conoscenza DB NO SQL",
+      "description": "Richiesta conoscenza dei principali database NO SQL."
+    },
+    {
+      "skill": "Esperienza in Google Big Query",
+      "description": "Richiesta esperienza nell'utilizzo di Google Big Query"
+    },
+    {
+      "skill": "Esperienza in Teradata",
+      "description": "Richiesta esperienza nell'utilizzo di Teradata"
+    },
+    {
+      "skill": "Esperienza in PostgreSQL",
+      "description": "Richiesta esperienza nell'utilizzo di PostgreSQL."
+    },
+    {
+      "skill": "Esperienza in Python",
+      "description": "Richiesta esperienza di sviluppo su Python"
+    },
+    {
+      "skill": "Esperienza in R",
+      "description": "Richiesta esperienza di sviluppo su R"
+    },
+    {
+      "skill": "Esperienza in SAS",
+      "description": "Richiesta esperienza di sviluppo su SAS"
+    },
+    {
+      "skill": "Esperienza in Spark",
+      "description": "Preferibile conoscenza ed esperienza di sviluppo con Spark"
+    },
+    {
+      "skill": "Esperienza in PY-Spark",
+      "description": "Preferibile conoscenza ed esperienza di sviluppo con PY-Spark"
+    },
+    {
+      "skill": "Esperienza in Julia",
+      "description": "Preferibile conoscenza ed esperienza di sviluppo con linguaggio Julia"
+    },
+    {
+      "skill": "Esperienza in Rust",
+      "description": "Preferibile conoscenza ed esperienza di sviluppo con linguaggio Rust"
+    },
+    {
+      "skill": "Conoscenza strumenti Google Cloud (BigQuery, Looker, ..)",
+      "description": "Richiesta conoscenza e utilizzo degli strumenti nativi della piattaforma Google Cloud, come BigQuery e Looker."
+    },
+    {
+      "skill": "Conoscenza di ETL e di data communication",
+      "description": "Richiesta conoscenza delle tecnologie di data transformation (ETL) e di data communication."
+    },
+    {
+      "skill": "Conoscenza Java (framework Spring)",
+      "description": "Richiesta conoscenza del linguaggio di programmazione Java e del framework Spring."
+    },
+    {
+      "skill": "Conoscenza di git",
+      "description": "Richiesta conoscenza del sistema di versionamento git."
+    },
+    {
+      "skill": "Conoscenza di Agile Scrum",
+      "description": "Richiesta conoscenza della metodologia di sviluppo Agile Scrum."
+    }
+  ]
+}
+
+json da elaborare
+###
+{json_lista}
+###
+
+Risposta:
+
+"""
 
     prompt_confronto_default = """
 Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
@@ -165,7 +320,8 @@ Conoscenza dello strumento ALM
     llm_helper = LLMHelper(temperature=st.session_state['temperature'], top_p=st.session_state['top_p'])
         
     st.session_state["container"] = st.text_input(label = "Nome della cartella dei CV sullo storage:", value=container_default)
-    st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=400)
+    st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=300)
+    st.session_state["prompt_split"] = st.text_area(label="Prompt di split :", value=prompt_split_default, height=600)
     st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
     
     st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd_default, height=300)
