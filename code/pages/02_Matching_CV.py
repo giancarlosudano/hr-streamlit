@@ -58,6 +58,18 @@ def valutazione():
         st.markdown("Json estratto (splitted):")
         st.json(json_data)
         
+        competenze_list = json_data['competenze']
+        df_skills = pd.DataFrame(competenze_list)
+        df_skills = df_skills.sort_values(by=['skill'], ascending=True)
+        st.write("Lista skills ordinate:")
+        st.markdown(df_skills.to_html(render_links=True),unsafe_allow_html=True)
+        st.write("\nLista skills ordinate (per copia):")
+        
+        for index, row in df_skills.iterrows():
+          # Accesso ai valori delle colonne per ogni riga
+          skill_line = row['skill']
+          st.markdown(skill_line)
+        
         container = st.session_state["container"] 
         cv_urls = llm_helper.blob_client.get_all_urls(container_name=container)
         
