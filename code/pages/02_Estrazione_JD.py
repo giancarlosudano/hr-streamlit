@@ -8,13 +8,14 @@ from collections import OrderedDict
 import time
 import json
 import pandas as pd
+import re
 
 def valutazione():
     try:
         
         llm_helper = LLMHelper(temperature=0, max_tokens=1500)
         
-        # CLASSIFICAZIONE LIVELLO
+        # ESTRAZIONE LIVELLO
         start_time_gpt = time.perf_counter()        
         llm_livello_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_livello"].format(jd = st.session_state["jd"]))
         end_time_gpt = time.perf_counter()
@@ -30,10 +31,37 @@ def valutazione():
           st.session_state["livello"] = "Senior"
         else:
           st.session_state["livello"] = "Fomrato non riconosciuto"
-            
+          
         st.info(f"Livello considerato: {st.session_state['livello']}")
+        
+        # ESTRAZIONE SENIORITY
+        start_time_gpt = time.perf_counter()        
+        llm_seniority_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_seniority"].format(jd = st.session_state["jd"]))
+        end_time_gpt = time.perf_counter()
+        gpt_duration = end_time_gpt - start_time_gpt
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
+        st.markdown(llm_seniority_text)
+        
+        match = re.search(r'\[(.*?)\]', llm_seniority_text)
+        if match:
+          st.session_state['seniority'] = match.group(1)
+        st.info(f"Seniority considerata: {st.session_state['seniority']}")
 
-        # ESTRAZIONE SKILL
+          
+        # ESTRAZIONE INDUSTRY
+        start_time_gpt = time.perf_counter()        
+        llm_industry_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_industry"].format(jd = st.session_state["jd"]))
+        end_time_gpt = time.perf_counter()
+        gpt_duration = end_time_gpt - start_time_gpt
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
+        st.markdown(llm_industry_text)
+        
+        match = re.search(r'\[(.*?)\]', llm_industry_text)
+        if match:
+          st.session_state['industry'] = match.group(1)         
+        st.info(f"Industry considerata: {st.session_state['industry']}")
+        
+        # ESTRAZIONE REQUISITI
         start_time_gpt = time.perf_counter()
         print("Prompt Estrazione:")
         print(st.session_state["prompt_estrazione"])
@@ -71,68 +99,12 @@ def valutazione():
         json_data = json.loads(json_string)
         st.markdown("Json estratto (splitted):")
         st.json(json_data)
-        competenze_list = json_data['competenze']
+        competenze_list = json_data['requisiti']
         df_skills = pd.DataFrame(competenze_list)
-        df_skills = df_skills.sort_values(by=['skill'], ascending=True)
+        df_skills = df_skills.sort_values(by=['nome'], ascending=True)
         st.write("Lista skills ordinate:")
         st.markdown(df_skills.to_html(render_links=True),unsafe_allow_html=True)
         st.write("\nLista skills ordinate (per copia):")
-        
-        for index, row in df_skills.iterrows():
-          # Accesso ai valori delle colonne per ogni riga
-          skill_line = row['skill']
-          st.markdown(skill_line)
-        
-        
-        container = st.session_state["container"] 
-        cv_urls = llm_helper.blob_client.get_all_urls(container_name=container)
-        
-        form_client = AzureFormRecognizerClient()
-
-        for cv_url in cv_urls:
-            try:
-                start_time_cv = time.perf_counter()
-                results = form_client.analyze_read(cv_url['fullpath'])
-                end_time_cv = time.perf_counter()
-                duration = end_time_cv - start_time_cv
-                cv = results[0]
-                
-                exp = st.expander(f"CV {cv_url['file']} caricato in {duration:.2f} secondi", expanded = True)
-                with exp:
-                    st.markdown(cv)
-
-                matching_count = 0
-                delay = int(st.session_state['delay'])
-                
-                for competenza in json_data["competenze"]:
-                    time.sleep(delay)
-                    skill = competenza["skill"]
-                    description = competenza["description"]
-                    
-                    llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_confronto"].format(cv = cv, skill = skill, description = description))
-                    
-                    # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
-                    if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
-                        matching_count = matching_count + 1
-                        cv_url['found'] += skill + ' ----- '
-
-                    st.markdown(f"Requisito: :blue[{skill}: {description}]")
-                    st.markdown("Risposta GPT: ")
-                    st.markdown(f"{llm_match_text}")
-                    st.markdown(f"**Matching Count: {matching_count}**")
-                    
-                cv_url['matching'] = matching_count
-
-            except Exception as e:
-                error_string = traceback.format_exc()
-                st.error(error_string)
-
-        df = pd.DataFrame(cv_urls)
-        df = df.sort_values(by=['matching'], ascending=False)
-        
-        st.write('')
-        st.markdown('## Risultati Matching CV')
-        st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
 
     except Exception as e:
         error_string = traceback.format_exc() 
@@ -140,17 +112,16 @@ def valutazione():
         print(error_string)
 
 try:
-    
+  
     prompt_estrazione_default = """Comportati come un recruiter professionista
 Fai una analisi accurata della Job Description delimitata da ###
-Cerca tutte le competenze e conoscenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza 
-Considera il titolo di studio e le lingue richieste come delle competenze.
+Cerca tutti i requisiti richiesti o desiderati e mostra il ragionamento che ti ha portato a scegliere ogni singolo requisito. 
 
-Le competenze devno essere categorizzate in 5 tipologie: 
+I requisiti devono essere categorizzati in 6 tipologie: 
 1 conoscenza specialistica (es. linguaggi di programmazione, conoscenza normative, conoscenza processi e tecniche...)
 2 conoscenza trasversale (es. capacità di lavorare in gruppo, rispettare scadenze stringenti, problem solving, capacità di comunicazione...)
 3 lingua (es. Inglese, Francese, Spagnolo...)
-4 requisito accademico (es. Laurea in informatica...)
+4 requisito accademico (es. Laurea in informatica...)  
 5 certificazione (es. Certificazione Microsoft Azure...)
 
 La job description è la seguente:
@@ -158,8 +129,8 @@ La job description è la seguente:
 {jd}
 ###
 
-Alla fine mostra tutte le competenze trovatein formato json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione", 
-dove "nome" è un nome molto breve della competenza, "tipologia" è la classificazione della competenza che hai trovato e "descrizione" è la descrizione della competenza.
+Alla fine mostra tutti i requisiti trovati in formato json con dentro una lista di elementi chiamata "requisiti" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione", 
+dove "nome" è un nome molto breve del requisito, "tipologia" è la classificazione del requisito che hai precedentemente trovato e "descrizione" è la descrizione della requisito.
 
 Risposta:\n"""
 
@@ -180,8 +151,31 @@ La job description è la seguente:
 
 Risposta:\n"""
 
+    prompt_estrazione_industry_default = """Comportati come un recruiter professionista
+Fai una analisi accurata della Job Description delimitata da ### ed estrai la industry della posizione ricercata e di cui si richiede esperienza diretta.
+Usa una descrizione breve della industry e racchiudi la descrizione tra parentesi quadre.
+
+La job description è la seguente:
+###
+{jd}
+###
+
+Risposta:\n
+"""
+    
+    prompt_estrazione_seniority_default = """Comportati come un recruiter professionista
+Fai una analisi accurata della Job Description delimitata da ### ed estrai il numero di anni di esperienza richiesti. 
+
+La job description è la seguente:
+###
+{jd}
+###
+
+Risposta:\n
+"""
+    
     prompt_split_default = """Dato il file json delimitato da ### con all'interno delle skill estratte da una job description precedente, 
-dovrai:
+devi:
 - produrre un nuovo json identico nella struttura
 - il nuovo json deve avere le stesste skill di quello delimitato da ### e se ci sono skill che raggruppano più competenze nella stessa riga, devi separare ogni competenza.
 
@@ -314,28 +308,6 @@ Risposta:
 
 """
 
-    prompt_confronto_default = """
-Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
-Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
-Mostra il ragionamento step by step che ti ha portato alla risposta.                   
-Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
-
-il CV è il seguente:
-###
-{cv}
-###
-
-la competenza da cercare è:
----
-{skill}: {description}
----
-
-Esempio di risposta:
-
-Ragionamento: 'inserisci qui il tuo ragionamento'
-Risposta: [True] o [False]
-"""
-
     container_default = "cv1"
     
     jd_default = """La figura ricercata, in qualità di TEST AND RELEASE MANAGER, dovrà contribuire alla definizione del pianodei rilasci applicativi, verificando conflitti di pianificazione, ottimizzando l’uso degli ambienti di test,garantendone il rispetto degli standard e delle procedure in materia change management e gestendo i rischiinformatici e i processi che ne regolano l’attività.
@@ -365,7 +337,10 @@ Esperienza su processo e strumenti CI/CD DevOps
 Conoscenza dello strumento ALM
 """
     st.title("Matching CV")
-
+    
+    st.session_state['seniority'] = ""
+    st.session_state['industry'] = ""
+    
     if st.session_state['delay'] is None or st.session_state['delay'] == '':
         st.session_state['delay'] = 1
     
@@ -376,13 +351,13 @@ Conoscenza dello strumento ALM
     with st.expander("Prompt di default"):
       st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=300)
       st.session_state["prompt_split"] = st.text_area(label="Prompt di split :", value=prompt_split_default, height=600)
-      st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
       st.session_state["prompt_estrazione_livello"] = st.text_area(label="Prompt di estrazione livello :", value=prompt_estrazione_livello_default, height=300)
-    
+      st.session_state["prompt_estrazione_seniority"] = st.text_area(label="Prompt di estrazione seniority :", value=prompt_estrazione_seniority_default, height=300)
+      st.session_state["prompt_estrazione_industry"] = st.text_area(label="Prompt di estrazione industry :", value=prompt_estrazione_industry_default, height=300)
     st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd_default, height=300)
 
     st.session_state['delay'] = st.slider("Delay in secondi tra le chiamate Open AI", 0, 5, st.session_state['delay'])
-    st.button(label="Calcola match", on_click=valutazione)
+    st.button(label="Analisi Job Description", on_click=valutazione)
 
     result_placeholder = st.empty()
 
