@@ -13,9 +13,28 @@ def valutazione():
     try:
         
         llm_helper = LLMHelper(temperature=0, max_tokens=1500)
+        
+        # CLASSIFICAZIONE LIVELLO
+        start_time_gpt = time.perf_counter()        
+        llm_livello_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_livello"].format(jd = st.session_state["jd"]))
+        end_time_gpt = time.perf_counter()
+        gpt_duration = end_time_gpt - start_time_gpt
+        st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
+        st.markdown(llm_livello_text)
+        
+        if '[junior]' in llm_livello_text.lower():
+          st.session_state["livello"] = "Junior"
+        elif '[intermediate]' in llm_livello_text.lower():
+          st.session_state["livello"] = "Intermediate"
+        elif '[senior]' in llm_livello_text.lower():
+          st.session_state["livello"] = "Senior"
+        else:
+          st.session_state["livello"] = "Fomrato non riconosciuto"
+            
+        st.info(f"Livello considerato: {st.session_state['livello']}")
 
+        # ESTRAZIONE SKILL
         start_time_gpt = time.perf_counter()
-
         print("Prompt Estrazione:")
         print(st.session_state["prompt_estrazione"])
         print("JD:")
@@ -37,27 +56,21 @@ def valutazione():
         st.markdown("Json estratto (iniziale):")
         st.json(json_data)
         
+        # SPLIT
         st.markdown(st.session_state["prompt_split"])
-        
         input_formatted = st.session_state["prompt_split"].replace('{json_lista}', json_string)
         st.markdown(input_formatted)
-        
         llm_skills_splitted_text = llm_helper.get_hr_completion(input_formatted)
         end_time_gpt = time.perf_counter()
         gpt_duration = end_time_gpt - start_time_gpt
-
         st.markdown(f"Risposta GPT in *{gpt_duration:.2f}*:")
         st.markdown(llm_skills_splitted_text)
-        
         inizio_json = llm_skills_text.index('{')
         fine_json = llm_skills_text.rindex('}') + 1
-        
         json_string = llm_skills_text[inizio_json:fine_json]
         json_data = json.loads(json_string)
-        
         st.markdown("Json estratto (splitted):")
         st.json(json_data)
-        
         competenze_list = json_data['competenze']
         df_skills = pd.DataFrame(competenze_list)
         df_skills = df_skills.sort_values(by=['skill'], ascending=True)
@@ -69,6 +82,7 @@ def valutazione():
           # Accesso ai valori delle colonne per ogni riga
           skill_line = row['skill']
           st.markdown(skill_line)
+        
         
         container = st.session_state["container"] 
         cv_urls = llm_helper.blob_client.get_all_urls(container_name=container)
@@ -130,8 +144,34 @@ try:
     prompt_estrazione_default = """Comportati come un recruiter professionista
 Fai una analisi accurata della Job Description delimitata da ###
 Cerca tutte le competenze e conoscenze richieste e mostra il ragionamento che ti ha portato a scegliere ogni singola competenza 
-Considera il titolo di studio come una competenza
-Alla fine mostra tutte le competenze trovate sotto forma di unico file json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiave "skill" e valore "description", dove skill è un nome molto breve  della competenza e description è la descrizione della competenza.
+Considera il titolo di studio e le lingue richieste come delle competenze.
+
+Le competenze devno essere categorizzate in 5 tipologie: 
+1 conoscenza specialistica (es. linguaggi di programmazione, conoscenza normative, conoscenza processi e tecniche...)
+2 conoscenza trasversale (es. capacità di lavorare in gruppo, rispettare scadenze stringenti, problem solving, capacità di comunicazione...)
+3 lingua (es. Inglese, Francese, Spagnolo...)
+4 requisito accademico (es. Laurea in informatica...)
+5 certificazione (es. Certificazione Microsoft Azure...)
+
+La job description è la seguente:
+###
+{jd}
+###
+
+Alla fine mostra tutte le competenze trovatein formato json con dentro una lista di elementi chiamata "competenze" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione", 
+dove "nome" è un nome molto breve della competenza, "tipologia" è la classificazione della competenza che hai trovato e "descrizione" è la descrizione della competenza.
+
+Risposta:\n"""
+
+    prompt_estrazione_livello_default = """
+Comportati come un recruiter professionista
+Fai una analisi accurata della Job Description delimitata da ### e classificala come Junior, Middle o Senior in base al numero di anni di esperienza richiesti nella job description. 
+Attieniti al numero di anni di esperienza richiesto nella job description e usa questa tabella di riferimento:
+Junior = 0-2 anni di esperienza richiesta
+Intermediate = 2-5 anni di esperienza richiesta
+Senior = 5+ anni di esperienza richiesta 
+Mostra il livello di esperienza trovato tra parentesi quadre ad esempio:
+[junior] [intermidiate] o [senior]
 
 La job description è la seguente:
 ###
@@ -140,7 +180,7 @@ La job description è la seguente:
 
 Risposta:\n"""
 
-    prompt_split_default = """Dato un il file json delimitato da ### con all'interno delle skill estratte da una job description precedente, 
+    prompt_split_default = """Dato il file json delimitato da ### con all'interno delle skill estratte da una job description precedente, 
 dovrai:
 - produrre un nuovo json identico nella struttura
 - il nuovo json deve avere le stesste skill di quello delimitato da ### e se ci sono skill che raggruppano più competenze nella stessa riga, devi separare ogni competenza.
@@ -277,7 +317,7 @@ Risposta:
     prompt_confronto_default = """
 Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
 Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
-Mostra il ragionamento step by step che ti ha portato alla risposta.                     
+Mostra il ragionamento step by step che ti ha portato alla risposta.                   
 Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
 
 il CV è il seguente:
@@ -332,9 +372,12 @@ Conoscenza dello strumento ALM
     llm_helper = LLMHelper(temperature=st.session_state['temperature'], top_p=st.session_state['top_p'])
         
     st.session_state["container"] = st.text_input(label = "Nome della cartella dei CV sullo storage:", value=container_default)
-    st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=300)
-    st.session_state["prompt_split"] = st.text_area(label="Prompt di split :", value=prompt_split_default, height=600)
-    st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
+    
+    with st.expander("Prompt di default"):
+      st.session_state["prompt_estrazione"] = st.text_area(label="Prompt di estrazione :", value=prompt_estrazione_default, height=300)
+      st.session_state["prompt_split"] = st.text_area(label="Prompt di split :", value=prompt_split_default, height=600)
+      st.session_state["prompt_confronto"] = st.text_area(label="Prompt di cofronto :", value=prompt_confronto_default, height=400)
+      st.session_state["prompt_estrazione_livello"] = st.text_area(label="Prompt di estrazione livello :", value=prompt_estrazione_livello_default, height=300)
     
     st.session_state["jd"] = st.text_area(label="Matching dei CV in archivio rispetto a questa Job Description:", value=jd_default, height=300)
 
