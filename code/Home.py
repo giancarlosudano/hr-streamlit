@@ -45,16 +45,13 @@ try:
     
     st.session_state["token_response"] = st.slider("Tokens response length", 100, 1500, 1000)
     st.session_state["temperature"] = st.slider("Temperature", 0.0, 1.0, 0.0)
-    st.session_state['delay'] = st.slider("Delay for any call in iterations", 0, 15, 0)
-    st.session_state['top_p'] = st.slider("Top P", 0.0, 1.0, 1.0)
-    st.session_state['frequency_penalty'] = st.slider("Frequency Penalty", 0.0, 1.0, 0.0)
-    st.session_state['presence_penalty'] = st.slider("Presence Penalty", 0.0, 1.0, 0.6)
-    st.session_state['best_of'] = st.slider("Best of", 1, 10, 1)
-    
+    st.session_state['top_p'] = st.slider("Top P", 0.0, 1.0, 1.0)    
     st.session_state["prompt_estrazione"] = ""
     st.session_state["prompt_confronto"] = ""
     st.session_state["container"] = "cv01"
     st.session_state["jd"] = ""
+    st.session_state['seniority'] = ""
+    st.session_state['industry'] = ""
     
 except Exception:
     st.error(traceback.format_exc())
