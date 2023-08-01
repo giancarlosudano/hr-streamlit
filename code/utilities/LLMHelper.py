@@ -119,7 +119,7 @@ class LLMHelper:
 
     def get_hr_completion(self, prompt: str):
         messages = [
-            SystemMessage(content="Sei un'assistente virtuale che lavora nella divisione Human Resources di una grande azienda e aiuta a fare analisi di Curruculum Vitae (CV) e Job Description (JD). Aiuti ad estrarre informazioni come le competenze richieste dalle job description per fare match con quelle espresse nei CV"),
+            SystemMessage(content="Sei un'assistente virtuale che lavora nella divisione Human Resources di una grande azienda e aiuta a fare analisi di Curruculum Vitae (CV) e Job Description (JD). Aiuti ad estrarre informazioni come i requisiti richiesti nelle job description per fare match con le competenze espresse nei CV"),
             HumanMessage(content=prompt)]
         return self.llm(messages).content
         

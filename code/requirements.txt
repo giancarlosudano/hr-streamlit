@@ -1,6 +1,6 @@
 azure-functions
-
 streamlit==1.20.0
+streamlit-modal
 openai==0.27.2
 matplotlib==3.6.3
 plotly==5.12.0

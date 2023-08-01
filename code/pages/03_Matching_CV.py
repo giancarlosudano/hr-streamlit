@@ -153,7 +153,7 @@ I requisiti devono essere categorizzati in 6 tipologie:
 1 conoscenza specialistica (es. linguaggi di programmazione, conoscenza normative, conoscenza processi e tecniche...)
 2 conoscenza trasversale (es. capacità di lavorare in gruppo, rispettare scadenze stringenti, problem solving, capacità di comunicazione...)
 3 lingua (es. Inglese, Francese, Spagnolo...)
-4 requisito accademico (es. Laurea in informatica...)  
+4 requisito accademico (es. Laurea in informatica...)
 5 certificazione (es. Certificazione Microsoft Azure...)
 
 La job description è la seguente:
