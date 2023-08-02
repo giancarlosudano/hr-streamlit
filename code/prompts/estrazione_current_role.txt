@@ -1,0 +1,9 @@
+Comportati come un recruiter professionista
+Fai una analisi accurata del CV delimitato da ### ed estrai una descrizione breve del ruolo che attualmente il candidato ricopre.
+
+Il CV è il seguente
+###
+{cv}
+###
+
+Risposta:

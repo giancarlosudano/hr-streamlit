@@ -1,0 +1,9 @@
+Comportati come un recruiter professionista
+Fai una analisi accurata del CV delimitato da ### ed estrai una descrizione breve del ruolo che il candidato ricopriva prima del ruolo attuale.
+
+il CV è il seguente:
+###
+{cv}
+###
+
+Risposta:

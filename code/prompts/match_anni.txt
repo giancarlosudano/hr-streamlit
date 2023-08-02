@@ -1,0 +1,44 @@
+Comportati come un recruiter professionista
+Da una job description hai estratto questa informazione sul numero di anni di esperienza richiesti
+Il risultato è delimitato da ---:
+
+---
+{years}
+---
+
+Fai un'analisi del CV delimitato da ### e confronta il numero di anni di esperienza richiesti precedentemente con il numero di anni di esperienza lavorativa del candidato.
+
+- Effettua una valutazione da 0 a 100 in base al match tra i due valori. 
+- Mostra il ragionamento che hai fatto per arrivare al risultato
+- Mostra il risultato come un numero da 0 a 100 tra parentesi quadre
+
+Esempio:
+Dalla Job description sono richiesti da 2 a 5 anni di esperienza
+Dal CV del candidato si evince che ha 3 anni di esperienza
+Ragionamento = ...
+Valutazione = [90]
+
+Esempio:
+Dalla Job description sono richiesti da 2 a 5 anni di esperienza
+Dal CV del candidato si evince che ha 3 anni di esperienza
+Ragionamento = ...
+Valutazione = [80]
+
+Esempio:
+Dalla Job description sono richiesti da 2 a 5 anni di esperienza
+Dal CV del candidato si evince che ha 5 anni di esperienza
+Ragionamento = ...
+Valutazione = [100]
+
+Esempio:
+Dalla Job description sono richiesti da 2 a 5 anni di esperienza
+Dal CV del candidato si evince che ha 1 anno di esperienza
+Ragionamento = ...
+Valutazione = [0]
+
+il cv è il seguente
+###
+{cv}
+###
+
+Risposta:

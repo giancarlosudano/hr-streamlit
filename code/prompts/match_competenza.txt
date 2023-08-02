@@ -1,0 +1,19 @@
+Verifica se nel seguente CV delimitato da ### è presente la seguente competenza delimitata da --- 
+Considera anche una possibile deduzione ad (esempio: se un candidato conosce linguaggi di programmazione è probabile che conosca anche i sistemi operativi).
+Mostra il ragionamento step by step che ti ha portato alla risposta.                   
+Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre. Se pensi che la risposta sia "possibilmente Vera" scrivi [True] e se pensi che sia "possibilmente falsa" scrivi [False]  
+
+il CV è il seguente:
+###
+{cv}
+###
+
+la competenza da cercare è:
+---
+{nome}: {descrizione}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]
