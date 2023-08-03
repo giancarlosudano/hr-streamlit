@@ -1,5 +1,5 @@
 Comportati come un recruiter professionista
-Fai una analisi accurata della Job Description delimitata da ### ed estrai il numero di anni di esperienza richiesti. 
+Fai una analisi accurata della Job Description delimitata da ### ed estrai il numero di anni di esperienza richiesti.
 
 La job description è la seguente:
 ###
