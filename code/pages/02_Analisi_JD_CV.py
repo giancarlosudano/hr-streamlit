@@ -90,24 +90,24 @@ def valutazione():
       st.success(f"Match Current Role Considerato: {st.session_state['match_current_role']}")
       
       # ESTRAZIONE PREVIOUS ROLE
-      # print("Prompt Estrazione Previous Role:")
-      # print(st.session_state["prompt_estrazione_previous_role"])
+      print("Prompt Estrazione Previous Role:")
+      print(st.session_state["prompt_estrazione_previous_role"])
       
-      # llm_previous_role_result = llm_helper.get_hr_completion(
-      #   st.session_state["prompt_estrazione_previous_role"]
-      #   .format(cv = st.session_state["cv"])
-      #   )
-      # st.markdown(llm_previous_role_result)
+      llm_previous_role_result = llm_helper.get_hr_completion(
+        st.session_state["prompt_estrazione_previous_role"]
+        .format(cv = st.session_state["cv"])
+        )
+      st.markdown(llm_previous_role_result)
       
-      # llm_previous_role_match_result = llm_helper.get_hr_completion(
-      #   st.session_state["prompt_match_previous_role"]
-      #   .format(jd = st.session_state["jd"], role = llm_previous_role_result)
-      #   )
+      llm_previous_role_match_result = llm_helper.get_hr_completion(
+        st.session_state["prompt_match_previous_role"]
+        .format(jd = st.session_state["jd"], role = llm_previous_role_result)
+        )
       
-      # match = re.search(r'\[(.*?)\]', llm_previous_role_match_result)
-      # if match:
-      #   st.session_state['match_previous_role'] = match.group(1)
-      # st.success(f"Match Previous Role Considerato: {st.session_state['match_previous_role']}")
+      match = re.search(r'\[(.*?)\]', llm_previous_role_match_result)
+      if match:
+        st.session_state['match_previous_role'] = match.group(1)
+      st.success(f"Match Previous Role Considerato: {st.session_state['match_previous_role']}")
       
       # ESTRAZIONE REQUISITI
       llm_skills_result = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_requisiti"].format(jd = st.session_state["jd"]))
@@ -157,7 +157,6 @@ def valutazione():
             st.markdown("Risposta GPT: ")
             st.markdown(f"{llm_match_text}")
             st.markdown(f"**Matching Count: {matching_count}**")
-
 
     except Exception as e:
         error_string = traceback.format_exc() 
