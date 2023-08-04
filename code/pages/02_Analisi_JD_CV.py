@@ -24,6 +24,8 @@ def valutazione():
       
       llm_helper = LLMHelper(temperature=0, max_tokens=1500)
       
+      output = []
+      
       # ESTRAZIONE LIVELLO
       llm_livello_result = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_livello"].format(jd = st.session_state["jd"]))
       st.markdown("### Estrazione Livello dalla Job Description")
@@ -40,10 +42,12 @@ def valutazione():
       
       st.info(f"Livello considerato: {st.session_state['livello']}")
       
+      output.append(["Livello", "Livello richiesto nella JD", st.session_state["livello"]])
+      
       # ESTRAZIONE SENIORITY
       st.markdown("### Estrazione Seniority (anni) dalla Job Description")
       llm_seniority_result = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_seniority"].format(jd = st.session_state["jd"]))
-      st.markdown(llm_seniority_result)      
+      st.markdown(llm_seniority_result)  
       match = re.search(r'\[(.*?)\]', llm_seniority_result)
       if match:
         st.session_state['seniority'] = match.group(1)
@@ -51,6 +55,8 @@ def valutazione():
         st.session_state['seniority'] = llm_seniority_result
         
       st.info(f"Seniority considerata: {st.session_state['seniority']}")
+      
+      output.append(["Seniority", "Anni di esperienza richiesta nella JD", st.session_state["seniority"]])
 
       # ESTRAZIONE INDUSTRY
       st.markdown("### Estrazione Industry dalla Job Description")
@@ -61,22 +67,25 @@ def valutazione():
         st.session_state['industry'] = match.group(1)         
       st.info(f"Industry considerata: {st.session_state['industry']}")
       
-      # ESTRAZIONE MANSIONI
-      st.markdown("### Estrazione Mansioni dalla Job Description")
-      llm_mansione_result_txt = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_mansioni"].format(jd = st.session_state["jd"]))
-      st.markdown(llm_mansione_result_txt)
-      inizio_json_mansioni = llm_mansione_result_txt.index('{')
-      fine_json_mansioni = llm_mansione_result_txt.rindex('}') + 1
-      json_string_mansioni = llm_mansione_result_txt[inizio_json_mansioni:fine_json_mansioni]
-      json_data_mansioni = json.loads(json_string_mansioni)
+      output.append(["Industry", "Industria di riferimento della JD", st.session_state["industry"]])
       
-      st.markdown("Json Mansioni (iniziale):")
-      st.json(json_data_mansioni)
+      # ESTRAZIONE MANSIONI
+      # st.markdown("### Estrazione Mansioni dalla Job Description")
+      # llm_mansione_result_txt = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_mansioni"].format(jd = st.session_state["jd"]))
+      # st.markdown(llm_mansione_result_txt)
+      # inizio_json_mansioni = llm_mansione_result_txt.index('{')
+      # fine_json_mansioni = llm_mansione_result_txt.rindex('}') + 1
+      # json_string_mansioni = llm_mansione_result_txt[inizio_json_mansioni:fine_json_mansioni]
+      # json_data_mansioni = json.loads(json_string_mansioni)
+      
+      # st.markdown("Json Mansioni (iniziale):")
+      # st.json(json_data_mansioni)
       
       # ESTRAZIONE REQUISITI
       st.markdown("### Estrazione Requisiti dalla Job Description")
       llm_requisiti_result_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_requisiti"].format(jd = st.session_state["jd"]))
       st.markdown(llm_requisiti_result_text)
+      
       inizio_json_requisiti = llm_requisiti_result_text.index('{')
       fine_json_requisiti = llm_requisiti_result_text.rindex('}') + 1
       json_string_requisiti = llm_requisiti_result_text[inizio_json_requisiti:fine_json_requisiti]
@@ -88,34 +97,33 @@ def valutazione():
       # SPLIT
       st.markdown("### Split Requisiti su più item")
       llm_skills_splitted_text = llm_helper.get_hr_completion(st.session_state["prompt_split_requisiti"].replace('{json_lista}', json_string_requisiti))
+      
       inizio_json_requisiti = llm_skills_splitted_text.index('{')
       fine_json_requisiti = llm_skills_splitted_text.rindex('}') + 1
       json_string_requisiti = llm_skills_splitted_text[inizio_json_requisiti:fine_json_requisiti]
       json_data_requisiti = json.loads(json_string_requisiti)
+      
       st.markdown("Json Requisiti (splitted):")
       st.json(json_data_requisiti)
-            
-      
-      # Match Mansioni
-      st.markdown("### Match Mansioni")
-      mansioni_matching_count = 0
-      delay = 1
-      
-      for mansione in json_data_mansioni["mansioni"]:
-          nome = mansione["nome"]
-          descrizione = mansione["descrizione"]
-          
-          llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_match_mansione"].format(cv = cv, nome = nome, descrizione = descrizione))
-          # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
-          if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
-              mansioni_matching_count = mansioni_matching_count + 1
 
-          st.markdown(f"Mansione: :blue[{nome}: {descrizione}]")
-          st.markdown("Risposta GPT: ")
-          st.markdown(f"{llm_match_text}")
-          st.markdown(f"**Matching Count: {mansioni_matching_count}**")
+      # Match Mansioni
+      # st.markdown("### Match Mansioni")
+      # mansioni_matching_count = 0
+      # delay = 1
       
-      
+      # for mansione in json_data_mansioni["mansioni"]:
+      #     nome = mansione["nome"]
+      #     descrizione = mansione["descrizione"]
+          
+      #     llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_match_mansione"].format(cv = cv, nome = nome, descrizione = descrizione))
+      #     # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
+      #     if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
+      #         mansioni_matching_count = mansioni_matching_count + 1
+
+      #     st.markdown(f"Mansione: :blue[{nome}: {descrizione}]")
+      #     st.markdown("Risposta GPT: ")
+      #     st.markdown(f"{llm_match_text}")
+      #     st.markdown(f"**Matching Count: {mansioni_matching_count}**")
       
       # Match Requisiti
       st.markdown("### Match Requisiti")
@@ -131,14 +139,23 @@ def valutazione():
             # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
             if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
                 requisiti_matching_count = requisiti_matching_count + 1
+                output.append([tipologia, nome, "1"])                
+            else:
+                output.append([tipologia, nome, "0"])
+          else:
+            output.append([tipologia, nome, "NA"])
 
             st.markdown(f"Requisito: :blue[{nome}: {descrizione}]")
             st.markdown("Risposta GPT: ")
             st.markdown(f"{llm_match_text}")
             st.markdown(f"**Matching Count: {requisiti_matching_count}**")
-    
+
+      # Stampa finale
+      df = pd.DataFrame(output, columns = ['Tipologia', 'Elemento', 'Match'])
+      st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
+      
     except Exception as e:
-        error_string = traceback.format_exc() 
+        error_string = traceback.format_exc()
         st.error(error_string)
         print(error_string)
 
@@ -177,12 +194,12 @@ try:
     with st.expander("Prompt di default"):
       st.session_state["prompt_estrazione_industry"] = st.text_area(label="Prompt di estrazione industry :", value=prompt_estrazione_industry_default, height=300)
       st.session_state["prompt_estrazione_livello"] = st.text_area(label="Prompt di estrazione livello :", value=prompt_estrazione_livello_default, height=300)
-      st.session_state["prompt_estrazione_mansioni"] = st.text_area(label="Prompt di estrazione mansioni :", value=prompt_estrazione_mansioni_default, height=300)
+      # st.session_state["prompt_estrazione_mansioni"] = st.text_area(label="Prompt di estrazione mansioni :", value=prompt_estrazione_mansioni_default, height=300)
       st.session_state["prompt_estrazione_requisiti"] = st.text_area(label="Prompt di estrazione requisiti :", value=prompt_estrazione_requisiti_default, height=300)
       st.session_state["prompt_estrazione_seniority"] = st.text_area(label="Prompt di estrazione seniority :", value=prompt_estrazione_seniority_default, height=300)
       st.session_state["prompt_split_requisiti"] = st.text_area(label="Prompt di split :", value=prompt_split_requisiti_default, height=300)
       st.session_state["prompt_match_competenza"] = st.text_area(label="Prompt di match competenza :", value=prompt_match_competenza_default, height=300)
-      st.session_state["prompt_match_mansione"] = st.text_area(label="Prompt di match mansione :", value=prompt_match_mansione_default, height=300)      
+      # st.session_state["prompt_match_mansione"] = st.text_area(label="Prompt di match mansione :", value=prompt_match_mansione_default, height=300)      
     st.session_state["jd"] = st.text_area(label="Job Description:", value=jd_default, height=200)
     
     uploaded_cv = st.file_uploader("Caricare un CV (formato PDF)", type=['txt', 'pdf'], key=1)
