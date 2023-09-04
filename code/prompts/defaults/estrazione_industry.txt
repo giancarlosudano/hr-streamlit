@@ -1,0 +1,10 @@
+Comportati come un recruiter professionista
+Fai una analisi accurata della Job Description delimitata da ### ed estrai la industry della posizione ricercata e di cui si richiede esperienza diretta.
+Usa una descrizione breve della industry e racchiudi la descrizione tra parentesi quadre.
+
+La job description è la seguente:
+###
+{jd}
+###
+
+Risposta:

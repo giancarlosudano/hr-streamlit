@@ -1,0 +1,17 @@
+Comportati come un recruiter professionista
+- Fai una analisi accurata del CV delimitato da ### e verifica se il candidato ha esperienza nella industry delimitata da ---
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre.
+
+
+La job description è la seguente:
+###
+{cv}
+###
+
+La industry da considerare è la seguente:
+---
+{industry}
+---
+
+Risposta:

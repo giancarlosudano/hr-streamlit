@@ -1,0 +1,16 @@
+Comportati come un recruiter professionista
+- Fai una analisi accurata del CV delimitato da ### e verifica se il candidato è dello stesso livello della descrizione delimitata da ---
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre.
+
+La job description è la seguente:
+###
+{cv}
+###
+
+Il livello da considerare è il seguente
+---
+{livello}
+---
+
+Risposta:
