@@ -120,8 +120,22 @@ try:
     if st.button(label="Ripristino prompt originali"):
       st.error("Vuoi veramente sovrascrivere tutti i prompt con quelli originali?")
       if st.button("Yes, I'm sure"):
-        st.info("Ok, here we go")
-    
+        
+        import shutil
 
+        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_industry.txt'),os.path.join('prompts', 'estrazione_industry.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_livello.txt'),os.path.join('prompts', 'estrazione_livello.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_requisiti.txt'),os.path.join('prompts', 'estrazione_requisiti.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_seniority.txt'),os.path.join('prompts', 'estrazione_seniority.txt') )
+        
+        shutil.copy2(os.path.join('prompts', 'defaults', 'match_industry.txt'),os.path.join('prompts', 'match_industry.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'match_livello.txt'),os.path.join('prompts', 'match_livello.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'match_competenza.txt'),os.path.join('prompts', 'match_competenza.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'match_seniority.txt'),os.path.join('prompts', 'match_seniority.txt') )
+        
+        shutil.copy2(os.path.join('prompts', 'defaults', 'split_requisiti.txt'),os.path.join('prompts', 'split_requisiti.txt') )
+        
+        st.info("Ripristino completato")
+    
 except Exception as e:
     st.error(traceback.format_exc())

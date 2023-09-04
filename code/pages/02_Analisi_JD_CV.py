@@ -164,9 +164,6 @@ try:
     
     with open(os.path.join('prompts','estrazione_livello.txt'),'r', encoding='utf-8') as file:
       prompt_estrazione_livello_default = file.read()
-      
-    with open(os.path.join('prompts','estrazione_mansioni.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_mansioni_default = file.read()
     
     with open(os.path.join('prompts','estrazione_requisiti.txt'),'r', encoding='utf-8') as file:
       prompt_estrazione_requisiti_default = file.read()
@@ -188,9 +185,6 @@ try:
     with open(os.path.join('prompts','match_competenza.txt'),'r', encoding='utf-8') as file:
       prompt_match_competenza_default = file.read()
     
-    with open(os.path.join('prompts','match_mansione.txt'),'r', encoding='utf-8') as file:
-      prompt_match_mansione_default = file.read()
-    
     # SPLIT
     with open(os.path.join('prompts','split_requisiti.txt'),'r', encoding='utf-8') as file:
       prompt_split_requisiti_default = file.read()
@@ -202,7 +196,6 @@ try:
     with st.expander("Prompt di default"):
       st.session_state["prompt_estrazione_industry"] = st.text_area(label="Prompt di estrazione industry :", value=prompt_estrazione_industry_default, height=300)
       st.session_state["prompt_estrazione_livello"] = st.text_area(label="Prompt di estrazione livello :", value=prompt_estrazione_livello_default, height=300)
-      # st.session_state["prompt_estrazione_mansioni"] = st.text_area(label="Prompt di estrazione mansioni :", value=prompt_estrazione_mansioni_default, height=300)
       st.session_state["prompt_estrazione_requisiti"] = st.text_area(label="Prompt di estrazione requisiti :", value=prompt_estrazione_requisiti_default, height=300)
       st.session_state["prompt_estrazione_seniority"] = st.text_area(label="Prompt di estrazione seniority :", value=prompt_estrazione_seniority_default, height=300)
       
@@ -212,7 +205,6 @@ try:
       st.session_state["prompt_match_livello"] = st.text_area(label="Prompt di match livello :", value=prompt_match_livello_default, height=300)
       st.session_state["prompt_match_seniority"] = st.text_area(label="Prompt di match seniority :", value=prompt_match_seniority_default, height=300)      
       st.session_state["prompt_match_competenza"] = st.text_area(label="Prompt di match competenza :", value=prompt_match_competenza_default, height=300)
-      # st.session_state["prompt_match_mansione"] = st.text_area(label="Prompt di match mansione :", value=prompt_match_mansione_default, height=300)      
     st.session_state["jd"] = st.text_area(label="Job Description:", value=jd_default, height=200)
     
     uploaded_cv = st.file_uploader("Caricare un CV (formato PDF)", type=['txt', 'pdf'], key=1)
