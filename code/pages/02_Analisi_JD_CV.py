@@ -22,7 +22,7 @@ import io
 def valutazione():
     try:
       
-      llm_helper = LLMHelper(temperature=0, max_tokens=3000)
+      llm_helper = LLMHelper(temperature=0, max_tokens=2500)
       
       import io
       output_debug = io.StringIO()
@@ -88,6 +88,10 @@ def valutazione():
         output.append(["Industry", st.session_state["industry"], "1"])
       else:
         output.append(["Industry", st.session_state["industry"], "0"])
+        
+      st.info(f"Risultato Industry: {llm_match_industry_result}")
+      
+      time.sleep(5)
       
       # ESTRAZIONE REQUISITI
       st.markdown("### Estrazione Requisiti dalla Job Description")
@@ -138,6 +142,11 @@ def valutazione():
           descrizione = requisito["descrizione"]
           if tipologia != "conoscenza trasversale":
             llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_match_competenza"].format(cv = cv, nome = nome, descrizione = descrizione))
+            
+            st.markdown(f"Requisito: :blue[{nome}: {descrizione}]")
+            st.markdown("Risposta GPT: ")
+            st.markdown(f"{llm_match_text}")
+            st.markdown(f"**Matching Count: {requisiti_matching_count}**")
             # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
             if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
                 requisiti_matching_count = requisiti_matching_count + 1
@@ -146,12 +155,9 @@ def valutazione():
                 output.append([tipologia, nome, "0"])
           else:
             output.append([tipologia, nome, "NA"])
-
-            st.markdown(f"Requisito: :blue[{nome}: {descrizione}]")
-            st.markdown("Risposta GPT: ")
-            st.markdown(f"{llm_match_text}")
-            st.markdown(f"**Matching Count: {requisiti_matching_count}**")
           
+          
+    
           output_debug.write(nome)
           output_debug.write(tipologia)
           output_debug.write(descrizione)
@@ -161,7 +167,6 @@ def valutazione():
       df = pd.DataFrame(output, columns = ['Tipologia', 'Elemento', 'Match'])
       st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
       
-      output_debug.write(df.to_html(render_links=True),unsafe_allow_html=True)
       final_debug_text = output_debug.getvalue()
       output_debug.close()
       

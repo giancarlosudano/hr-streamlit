@@ -1,6 +1,6 @@
 Comportati come un recruiter professionista
 Fai una analisi accurata della Job Description delimitata da ###
-Cerca tutti i requisiti richiesti o desiderati e mostra il ragionamento che ti ha portato a scegliere ogni singolo requisito.
+Cerca tutti i requisiti richiesti o desiderati.
 
 I requisiti devono essere categorizzati in 6 tipologie:
 
@@ -17,7 +17,7 @@ La job description è la seguente:
 {jd}
 ###
 
-Alla fine mostra tutti i requisiti trovati in formato json con dentro una lista di elementi chiamata "requisiti" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione",
+Mostra tutti i requisiti trovati in formato json con dentro una lista di elementi chiamata "requisiti" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione",
 dove "nome" è un nome molto breve del requisito, "tipologia" è la classificazione del requisito che hai precedentemente trovato e "descrizione" è la descrizione della requisito.
 
 Risposta:
