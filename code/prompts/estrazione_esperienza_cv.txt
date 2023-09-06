@@ -7,4 +7,6 @@ Il CV è il seguente:
 {cv}
 ###
 
+Esempio di risposta: 5
+
 Risposta:

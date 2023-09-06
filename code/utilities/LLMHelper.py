@@ -77,9 +77,9 @@ class LLMHelper:
         self.text_splitter: TextSplitter = TokenTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap) if text_splitter is None else text_splitter
         
         if self.deployment_type == "Chat":
-            self.llm: ChatOpenAI = ChatOpenAI(model_name=self.deployment_name, engine=self.deployment_name, temperature=self.temperature, max_tokens=self.max_tokens) if llm is None else llm
+            self.llm: ChatOpenAI = ChatOpenAI(model_name=self.deployment_name, engine=self.deployment_name, temperature=self.temperature, max_tokens=self.max_tokens, request_timeout=180) if llm is None else llm
         else:
-            self.llm: AzureOpenAI = AzureOpenAI(deployment_name=self.deployment_name, temperature=self.temperature, max_tokens=self.max_tokens, max_retries=0) if llm is None else llm
+            self.llm: AzureOpenAI = AzureOpenAI(deployment_name=self.deployment_name, temperature=self.temperature, max_tokens=self.max_tokens, max_retries=0, request_timeout=180) if llm is None else llm
         
         self.k : int = 3 if k is None else k
 
@@ -89,33 +89,6 @@ class LLMHelper:
 
         self.user_agent: UserAgent() = UserAgent()
         self.user_agent.random
-
-    def get_semantic_answer_lang_chain(self, question, chat_history):
-        question_generator = LLMChain(llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT, verbose=False)
-        doc_chain = load_qa_with_sources_chain(self.llm, chain_type="stuff", verbose=False, prompt=PROMPT)
-        chain = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),
-            question_generator=question_generator,
-            combine_docs_chain=doc_chain,
-            return_source_documents=True,
-            # top_k_docs_for_context= self.k
-        )
-        result = chain({"question": question, "chat_history": chat_history})
-        context = "\n".join(list(map(lambda x: x.page_content, result['source_documents'])))
-        sources = "\n".join(set(map(lambda x: x.metadata["source"], result['source_documents'])))
-
-        container_sas = self.blob_client.get_container_sas()
-        
-        result['answer'] = result['answer'].split('SOURCES:')[0].split('Sources:')[0].split('SOURCE:')[0].split('Source:')[0]
-        sources = sources.replace('_SAS_TOKEN_PLACEHOLDER_', container_sas)
-
-        return question, result['answer'], context, sources
-
-    def get_completion(self, prompt, **kwargs):
-        if self.deployment_type == 'Chat':
-            return self.llm([HumanMessage(content=prompt)]).content
-        else:
-            return self.llm(prompt)
 
     def get_hr_completion(self, prompt: str):
         messages = [
