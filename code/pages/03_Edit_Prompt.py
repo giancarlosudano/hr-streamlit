@@ -22,48 +22,38 @@ def salvataggio():
     try:
       
       # Estrazione
+      prompt_estrazione_esperienza_jd = st.session_state["prompt_estrazione_esperienza_jd"]
+      prompt_estrazione_esperienza_cv = st.session_state["prompt_estrazione_esperienza_cv"]
       prompt_estrazione_industry = st.session_state["prompt_estrazione_industry"]
-      prompt_estrazione_livello = st.session_state["prompt_estrazione_livello"]
       prompt_estrazione_requisiti = st.session_state["prompt_estrazione_requisiti"]
-      prompt_estrazione_seniority = st.session_state["prompt_estrazione_seniority"]
+      prompt_estrazione_requisiti_json = st.session_state["prompt_estrazione_requisiti_json"]
       
       # Match
       prompt_match_industry = st.session_state["prompt_match_industry"]
-      prompt_match_livello = st.session_state["prompt_match_livello"]
-      prompt_match_seniority = st.session_state["prompt_match_seniority"]
       prompt_match_competenza = st.session_state["prompt_match_competenza"]
-      
-      # Split
-      prompt_split_requisiti = st.session_state["prompt_split_requisiti"]
       
       # Salvataggio su file
       with open(os.path.join('prompts','estrazione_industry.txt'),'w', encoding='utf-8') as file:
         file.write(prompt_estrazione_industry)
       
-      with open(os.path.join('prompts','estrazione_livello.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_livello)
+      with open(os.path.join('prompts','estrazione_esperienza_cv.txt'),'w', encoding='utf-8') as file:
+        file.write(prompt_estrazione_esperienza_cv)
+        
+      with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'w', encoding='utf-8') as file:
+        file.write(prompt_estrazione_esperienza_jd)
         
       with open(os.path.join('prompts','estrazione_requisiti.txt'),'w', encoding='utf-8') as file:
         file.write(prompt_estrazione_requisiti)
       
-      with open(os.path.join('prompts','estrazione_seniority.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_seniority)
+      with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'w', encoding='utf-8') as file:
+        file.write(prompt_estrazione_requisiti_json)
       
       with open(os.path.join('prompts','match_industry.txt'),'w', encoding='utf-8') as file:
         file.write(prompt_match_industry)
       
-      with open(os.path.join('prompts','match_livello.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_match_livello)
-      
-      with open(os.path.join('prompts','match_seniority.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_match_seniority)
-      
       with open(os.path.join('prompts','match_competenza.txt'),'w', encoding='utf-8') as file:
         file.write(prompt_match_competenza)
             
-      with open(os.path.join('prompts','split_requisiti.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_split_requisiti)
-      
     except Exception as e:
         error_string = traceback.format_exc()
         st.error(error_string)
@@ -76,13 +66,16 @@ try:
       prompt_estrazione_industry_default = file.read()
     
     with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_esperienza__jd_default = file.read()
+      prompt_estrazione_esperienza_jd_default = file.read()
 
     with open(os.path.join('prompts','estrazione_esperienza_cv.txt'),'r', encoding='utf-8') as file:
       prompt_estrazione_esperienza_cv_default = file.read()
           
     with open(os.path.join('prompts','estrazione_requisiti.txt'),'r', encoding='utf-8') as file:
       prompt_estrazione_requisiti_default = file.read()
+      
+    with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
+      prompt_estrazione_requisiti_json_default = file.read()
                 
     # MATCH
     with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
@@ -91,10 +84,6 @@ try:
     with open(os.path.join('prompts','match_competenza.txt'),'r', encoding='utf-8') as file:
       prompt_match_competenza_default = file.read()
     
-    # SPLIT
-    with open(os.path.join('prompts','split_requisiti.txt'),'r', encoding='utf-8') as file:
-      prompt_split_requisiti_default = file.read()
-      
     # JD
     with open(os.path.join('prompts','job_description.txt'),'r', encoding='utf-8') as file:
       prompt_job_description_default = file.read()
@@ -102,11 +91,11 @@ try:
     st.title("Edit Prompt")
     
     st.session_state["prompt_estrazione_industry"] = st.text_area(label="Prompt di estrazione industry :", value=prompt_estrazione_industry_default, height=300)
-    st.session_state["prompt_estrazione_esperienza_jd"] = st.text_area(label="Prompt di estrazione esperienza richiesta :", value=prompt_estrazione_esperienza__jd_default, height=300)
+    st.session_state["prompt_estrazione_esperienza_jd"] = st.text_area(label="Prompt di estrazione esperienza richiesta :", value=prompt_estrazione_esperienza_jd_default, height=300)
     st.session_state["prompt_estrazione_esperienza_cv"] = st.text_area(label="Prompt di estrazione esperienza attuale :", value=prompt_estrazione_esperienza_cv_default, height=300)
     st.session_state["prompt_estrazione_requisiti"] = st.text_area(label="Prompt di estrazione requisiti :", value=prompt_estrazione_requisiti_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_json"] = st.text_area(label="Prompt di estrazione requisiti JSON :", value=prompt_estrazione_requisiti_json_default, height=300)
     
-    st.session_state["prompt_split_requisiti"] = st.text_area(label="Prompt di split :", value=prompt_split_requisiti_default, height=300)
 
     st.session_state["prompt_match_industry"] = st.text_area(label="Prompt di match industry :", value=prompt_match_industry_default, height=300)
     st.session_state["prompt_match_competenza"] = st.text_area(label="Prompt di match competenza :", value=prompt_match_competenza_default, height=300)
@@ -123,12 +112,11 @@ try:
         shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_esperienza_jd.txt'),os.path.join('prompts', 'estrazione_esperienza_jd.txt') )
         shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_esperienza_cv.txt'),os.path.join('prompts', 'estrazione_esperienza_cv.txt') )
         shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_requisiti.txt'),os.path.join('prompts', 'estrazione_requisiti.txt') )
+        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_requisiti_json.txt'),os.path.join('prompts', 'estrazione_requisiti_json.txt') )
         shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_seniority.txt'),os.path.join('prompts', 'estrazione_seniority.txt') )
         
         shutil.copy2(os.path.join('prompts', 'defaults', 'match_industry.txt'),os.path.join('prompts', 'match_industry.txt') )
         shutil.copy2(os.path.join('prompts', 'defaults', 'match_competenza.txt'),os.path.join('prompts', 'match_competenza.txt') )
-        
-        shutil.copy2(os.path.join('prompts', 'defaults', 'split_requisiti.txt'),os.path.join('prompts', 'split_requisiti.txt') )
         
         shutil.copy2(os.path.join('prompts', 'defaults', 'job_description.txt'),os.path.join('prompts', 'job_description.txt') )
         

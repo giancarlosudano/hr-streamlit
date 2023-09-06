@@ -10,7 +10,7 @@ il CV è il seguente:
 
 la competenza da cercare è:
 ---
-{nome}: {descrizione}
+{nome}
 ---
 
 Esempio di risposta:

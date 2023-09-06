@@ -3,21 +3,17 @@ Fai una analisi accurata della Job Description delimitata da ###
 Cerca tutti i requisiti richiesti o desiderati.
 
 I requisiti devono essere categorizzati in 6 tipologie:
-
-1 conoscenza specialistica (es. linguaggi di programmazione, conoscenza normative, conoscenza processi e tecniche...)
-2 conoscenza trasversale (es. capacità di lavorare in gruppo, rispettare scadenze stringenti, problem solving, capacità di comunicazione...)
-3 lingua (es. Inglese, Francese, Spagnolo...)
-4 requisito accademico (es. Laurea in informatica...) 
-5 certificazione (es. Certificazione Microsoft Azure...)
-6 principali attività che caratterizzano il ruolo, inteso come compiti e azioni che ci si aspetta vengano svolti nello svolgimento delle attività  tipiche del ruolo descritto nella job description
+1 principali attività (es. le principali attività che caratterizzano il ruolo, in particolare compiti e azioni che ci si aspetta vengano svolti nello svolgimento delle attività tipiche del ruolo descritto nella job description. come il Mantenimento della relazione con gli stakeholder, la creazione di un report giornaliero, la programmazione, ...)
+2 conoscenza specialistica (es. linguaggi di programmazione, conoscenza normative, conoscenza processi e tecniche...)  
+3 conoscenza trasversale (es. capacità di lavorare in gruppo, rispettare scadenze stringenti, problem solving, capacità di comunicazione...)  
+4 lingua (es. Inglese, Francese, Spagnolo...)  
+5 certificazione (es. Certificazione Microsoft Azure...)  
+6 titolo di studio (es. Laurea in informatica...)
 
 La job description è la seguente:
 
 ###
 {jd}
 ###
-
-Mostra tutti i requisiti trovati in formato json con dentro una lista di elementi chiamata "requisiti" e i singoli elementi avranno chiavi "nome", "tipologia" e "descrizione",
-dove "nome" è un nome molto breve del requisito, "tipologia" è la classificazione del requisito che hai precedentemente trovato e "descrizione" è la descrizione della requisito.
 
 Risposta:

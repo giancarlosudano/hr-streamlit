@@ -22,7 +22,7 @@ import io
 def valutazione():
     try:
       
-      llm_helper = LLMHelper(temperature=0, max_tokens=2500)
+      llm_helper = LLMHelper(temperature=0, max_tokens=4000)
       
       import io
       output_debug = io.StringIO()
@@ -62,7 +62,7 @@ def valutazione():
       
       output.append(["Anni di esperienza minima richiesti dalla job description", st.session_state["esperienza_minima"], "NA"])
       output.append(["Anni di esperienza massima richiesti dalla job description", st.session_state["esperienza_massima"], "NA"])
-                  
+
       # ESTRAZIONE INDUSTRY
       st.markdown("### Estrazione Industry dalla Job Description")
       llm_industry_result = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_industry"].format(jd = st.session_state["jd"]))
@@ -82,7 +82,9 @@ def valutazione():
       st.markdown(llm_match_industry_result)
       
       output_debug.write(st.session_state["prompt_match_industry"])
+      output_debug.write("\n")
       output_debug.write(llm_match_industry_result)
+      output_debug.write("\n")
       
       if 'true]' in llm_match_industry_result.lower() or 'possibilmente vera' in llm_match_industry_result.lower():
         output.append(["Industry", st.session_state["industry"], "1"])
@@ -95,58 +97,55 @@ def valutazione():
       
       # ESTRAZIONE REQUISITI
       st.markdown("### Estrazione Requisiti dalla Job Description")
-      llm_requisiti_result_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_requisiti"].format(jd = st.session_state["jd"]))
+      llm_requisiti_result_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_requisiti"].replace('{jd}', st.session_state["jd"]))
       st.markdown(llm_requisiti_result_text)
       
       output_debug.write(st.session_state["prompt_estrazione_requisiti"])
+      output_debug.write("\n")
       output_debug.write(llm_requisiti_result_text)
+      output_debug.write("\n")
       
-      inizio_json_requisiti = llm_requisiti_result_text.index('{')
-      fine_json_requisiti = llm_requisiti_result_text.rindex('}') + 1
-      json_string_requisiti = llm_requisiti_result_text[inizio_json_requisiti:fine_json_requisiti]
-      print('------------------')
-      print(json_string_requisiti)
-      print('------------------')
+      #ESTRAZIONE REQUISITI JSON
+      st.markdown("### Conversione Requisiti in JSON")
+      llm_requisiti_json_text = llm_helper.get_hr_completion(st.session_state["prompt_estrazione_requisiti_json"].replace('{lista}', llm_requisiti_result_text))
+      
+      output_debug.write(llm_requisiti_json_text)
+      output_debug.write("\n")
+      
+      inizio_json_requisiti = llm_requisiti_json_text.index('{')
+      fine_json_requisiti = llm_requisiti_json_text.rindex('}') + 1
+      json_string_requisiti = llm_requisiti_json_text[inizio_json_requisiti:fine_json_requisiti]
       json_data_requisiti = json.loads(json_string_requisiti)
+      
+      output_debug.write(json_string_requisiti)
+      output_debug.write("\n")
       
       st.markdown("Json Requisiti (iniziale):")
       st.json(json_data_requisiti)
       
-      # SPLIT
-      st.markdown("### Split Requisiti su più item")
-      llm_skills_splitted_text = llm_helper.get_hr_completion(st.session_state["prompt_split_requisiti"].replace('{json_lista}', json_string_requisiti))
-
-      output_debug.write(st.session_state["prompt_split_requisiti"])
-      output_debug.write(llm_skills_splitted_text)
-      
-      inizio_json_requisiti = llm_skills_splitted_text.index('{')
-      fine_json_requisiti = llm_skills_splitted_text.rindex('}') + 1
-      json_string_requisiti = llm_skills_splitted_text[inizio_json_requisiti:fine_json_requisiti]
-      json_data_requisiti = json.loads(json_string_requisiti)
-      
-      output_debug.write(json_string_requisiti)
-      
-      st.markdown("Json Requisiti (splitted):")
-      st.json(json_data_requisiti)
-      
-      # Match Requisiti
-      st.markdown("### Match Requisiti")
-      requisiti_matching_count = 0
-      delay = 1
-      
       output_debug.write(st.session_state["prompt_match_competenza"])
+      output_debug.write("\n")
+      
+      requisiti_matching_count = 0
       
       for requisito in json_data_requisiti["requisiti"]:
           nome = requisito["nome"]
           tipologia = requisito["tipologia"]
-          descrizione = requisito["descrizione"]
           if tipologia != "conoscenza trasversale":
-            llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_match_competenza"].format(cv = cv, nome = nome, descrizione = descrizione))
+            llm_match_text = llm_helper.get_hr_completion(st.session_state["prompt_match_competenza"].format(cv = cv, nome = nome))
             
-            st.markdown(f"Requisito: :blue[{nome}: {descrizione}]")
+            st.markdown(f"Requisito: :blue[{nome}]")
             st.markdown("Risposta GPT: ")
             st.markdown(f"{llm_match_text}")
-            st.markdown(f"**Matching Count: {requisiti_matching_count}**")
+            
+            output_debug.write(nome)
+            output_debug.write("\n")
+            output_debug.write(tipologia)
+            output_debug.write("\n")
+            output_debug.write(llm_match_text)
+            output_debug.write("\n")
+            output_debug.write("\n")
+            
             # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
             if 'true]' in llm_match_text.lower() or 'possibilmente vera' in llm_match_text.lower():
                 requisiti_matching_count = requisiti_matching_count + 1
@@ -156,12 +155,6 @@ def valutazione():
           else:
             output.append([tipologia, nome, "NA"])
           
-          
-    
-          output_debug.write(nome)
-          output_debug.write(tipologia)
-          output_debug.write(descrizione)
-          output_debug.write(llm_match_text)
 
       # Stampa finale
       df = pd.DataFrame(output, columns = ['Tipologia', 'Elemento', 'Match'])
@@ -198,6 +191,9 @@ try:
     
     with open(os.path.join('prompts','estrazione_requisiti.txt'),'r', encoding='utf-8') as file:
       prompt_estrazione_requisiti_default = file.read()
+      
+    with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
+      prompt_estrazione_requisiti_json_default = file.read()
     
     # MATCH
     with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
@@ -220,7 +216,7 @@ try:
       st.session_state["prompt_estrazione_esperienza_cv"] = st.text_area(label="Prompt di estrazione Esperienza Attuale :", value=prompt_estrazione_esperienza_cv_default, height=300)
 
       st.session_state["prompt_estrazione_requisiti"] = st.text_area(label="Prompt di estrazione Requisiti :", value=prompt_estrazione_requisiti_default, height=300)
-      st.session_state["prompt_split_requisiti"] = st.text_area(label="Prompt di split :", value=prompt_split_requisiti_default, height=300)
+      st.session_state["prompt_estrazione_requisiti_json"] = st.text_area(label="Prompt di estrazione Requisiti JSON :", value=prompt_estrazione_requisiti_json_default, height=300)
 
       st.session_state["prompt_match_industry"] = st.text_area(label="Prompt di match industry :", value=prompt_match_industry_default, height=300)
       st.session_state["prompt_match_competenza"] = st.text_area(label="Prompt di match competenza :", value=prompt_match_competenza_default, height=300)

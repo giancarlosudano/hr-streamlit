@@ -8,9 +8,9 @@ Esempio
 json iniziale:
 
 {
-  "competenze": [
+  "requisiti": [
     {
-      "skill": "Conoscenza dei principali DB SQL e NO SQL",
+      "nome": "Conoscenza dei principali DB SQL e NO SQL",
       "description": "Richiesta conoscenza dei principali database SQL."
     },
     {
