@@ -1,0 +1,10 @@
+Comportati come un recruiter professionista
+- Estrai dal CV delimitato da ### il numero di anni di esperienza lavorativa totale del candidato.
+- La tua risposta deve comprendere semplicemente un numero intero, senza alcun carattere aggiuntivo.
+
+Il CV è il seguente:
+###
+{cv}
+###
+
+Risposta:

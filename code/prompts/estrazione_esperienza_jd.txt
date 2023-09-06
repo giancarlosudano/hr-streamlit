@@ -1,0 +1,11 @@
+Comportati come un recruiter professionista
+- Estrai dalla Job Description delimitata da ### il numero di anni di eperienza lavorativa minimo e massimo richiesti al candidato
+- La tua risposta deve essere di tipo json con chiave minimo e massimo
+- La tua rispsota deve comprendere semplicemente il json senza commenti o caratteri aggiuntivi.
+
+La Job Description è la seguente:
+###
+{jd}
+###
+
+Risposta:
