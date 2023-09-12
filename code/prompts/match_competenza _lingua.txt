@@ -1,0 +1,22 @@
+Dato il seguente CV delimitato da ###, e il nome di una lingua da parlare delimitato da ---
+
+- Verifica se è probabile che il candidato conosca la lingua richiesta ad un buon livello 
+- Restituisci false se il candidato indica un livello medio o basso
+- Restituisci true se il candidato dichiara un livello medio-alto o alto o se non indica il livello
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre
+
+il CV è il seguente:
+###
+{cv}
+###
+
+la lingua da cercare è:
+---
+{nome}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]

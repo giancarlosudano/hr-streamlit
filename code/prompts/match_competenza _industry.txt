@@ -1,0 +1,20 @@
+Dato il seguente CV delimitato da ###, e la descrizione di una esperienza lavorativa delimitata da --- 
+
+- Verifica se il candidato ha l'esperienza lavorativa (Ad es.: Se ha lavorato nella consulenza avendo come clienti banche, ok attribuire esperienza nel settore bancario)
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre
+
+il CV è il seguente:
+###
+{cv}
+###
+
+l'esperienza lavorativa da cercare è:
+---
+{nome}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]

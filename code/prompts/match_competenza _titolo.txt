@@ -1,0 +1,20 @@
+Dato il seguente CV delimitato da ###, e la descrizione di un titolo di studio delimtato da --- 
+
+- Verifica se il candidato nel CV dichiara di possedere il titolo di studio
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre  
+
+il CV è il seguente:
+###
+{cv}
+###
+
+il titolo di studio da cercare è:
+---
+{nome}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]

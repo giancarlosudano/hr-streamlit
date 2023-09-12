@@ -1,0 +1,21 @@
+Dato il seguente CV delimitato da ###, e la descrizione di una skill delimitata da --- 
+
+- Dimmi se il candidato ha la skill specifiche. 
+- Non fare ragionamenti particolari o deduzioni, indica solo se il candidato ha le skill o meno
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre  
+
+il CV è il seguente:
+###
+{cv}
+###
+
+la skill da cercare è:
+---
+{nome}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]

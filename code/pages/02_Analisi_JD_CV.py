@@ -19,32 +19,63 @@ def valutazione():
       cv = st.session_state["cv"]
       
       # ESTRAZIONE
-      with open(os.path.join('prompts','estrazione_industry.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_industry = file.read()
       
-      with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_esperienza_jd = file.read()
-          
       with open(os.path.join('prompts','estrazione_esperienza_cv.txt'),'r', encoding='utf-8') as file:
         prompt_estrazione_esperienza_cv = file.read()
+
+      with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_esperienza_jd = file.read()
       
-      with open(os.path.join('prompts','estrazione_requisiti.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_requisiti = file.read()
+      with open(os.path.join('prompts','estrazione_industry.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_industry = file.read()
+            
+      with open(os.path.join('prompts','estrazione_requisiti_attivita.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_attivita = file.read()
+      
+      with open(os.path.join('prompts','estrazione_requisiti_certificazione.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_certificazione = file.read()
+      
+      with open(os.path.join('prompts','estrazione_requisiti_lingua.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_lingua = file.read()
         
+      with open(os.path.join('prompts','estrazione_requisiti_specialistica.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_lingua = file.read()
         
-      with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_requisiti_json = file.read()
+      with open(os.path.join('prompts','estrazione_requisiti_titolo.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_specialistica = file.read()
+        
+      with open(os.path.join('prompts','estrazione_requisiti_trasversale.txt'),'r', encoding='utf-8') as file:
+        prompt_estrazione_requisiti_trasversale = file.read()
+        
+      with open(os.path.join('prompts','match_competenza_attivita.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_attivita = file.read()
       
-      # MATCH
-      with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
-        prompt_match_industry = file.read()
+      with open(os.path.join('prompts','match_competenza_certificazione.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_certificazione = file.read()
       
+      with open(os.path.join('prompts','match_competenza_industry.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_industry = file.read()
+      
+      with open(os.path.join('prompts','match_competenza_lingua.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_lingua = file.read()
+      
+      with open(os.path.join('prompts','match_competenza_specialistica.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_specialistica = file.read()
+        
+      with open(os.path.join('prompts','match_competenza_titolo.txt'),'r', encoding='utf-8') as file:
+        prompt_match_competenza_titolo = file.read()
+
       with open(os.path.join('prompts','match_competenza.txt'),'r', encoding='utf-8') as file:
         prompt_match_competenza = file.read()
       
-      # SPLIT
-      with open(os.path.join('prompts','split_requisiti.txt'),'r', encoding='utf-8') as file:
-        prompt_split_requisiti = file.read()
+      with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
+        prompt_match_industry = file.read()
+        
+      with open(os.path.join('prompts','trasformazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
+        prompt_trasformazione_requisiti_json = file.read()
+
+      with open(os.path.join('prompts','trasformazione_requisiti_merge.txt'),'r', encoding='utf-8') as file:
+        prompt_trasformazione_requisiti_merge = file.read()
       
       llm_helper = LLMHelper(temperature=0, max_tokens=4000)
       
@@ -57,7 +88,7 @@ def valutazione():
       output = []
       
       # ESTRAZIONE ESPERIENZA ATTUALE CV
-      llm_esperienza_cv_result = llm_helper.get_hr_completion(prompt_estrazione_esperienza_cv.replace('{cv}' = cv, jd = jd))
+      llm_esperienza_cv_result = llm_helper.get_hr_completion(prompt_estrazione_esperienza_cv.replace('{cv}', cv).replace('{jd}', jd))
       st.markdown("### Estrazione Livello dalla Job Description")
       st.markdown(llm_esperienza_cv_result)
       

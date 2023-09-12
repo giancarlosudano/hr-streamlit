@@ -1,0 +1,22 @@
+Dato il seguente CV delimitato da ###, e la descrizione di una attività delimitata da ---
+
+- Verifica se è probabile che il candidato svolga o abbia svolto l'attività, alla luce delle sue posizioni attuali e precedenti
+- Prendi in considerazione anche i job title elencati nel CV
+- Mostra il ragionamento step by step che ti ha portato alla risposta
+- Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre
+
+
+il CV è il seguente:
+###
+{cv}
+###
+
+l'attività da cercare è:
+---
+{nome}
+---
+
+Esempio di risposta:
+
+Ragionamento: 'inserisci qui il tuo ragionamento'
+Risposta: [True] o [False]

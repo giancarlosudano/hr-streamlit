@@ -1,0 +1,17 @@
+Nel testo delimitato da ### trovi una lista di requisiti estratti da una Job Description suddivisi per categoria  
+ 
+###  
+{lista}
+###
+  
+crea un json con questa forma  
+  
+{    
+    "requisiti":     
+    [     
+        { "nome": "", "tipologia": "" },    
+        { "nome": "", "tipologia": "" }    
+    ]    
+}  
+  
+nel testo non considerare i commenti iniziali o finali, concentrati solo sui requisiti
