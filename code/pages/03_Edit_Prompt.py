@@ -36,47 +36,22 @@ def salvataggio():
       write_file("prompt_estrazione_requisiti_certificazione.txt",  st.session_state["prompt_estrazione_requisiti_certificazione"])
       write_file("prompt_estrazione_requisiti_lingua.txt",          st.session_state["prompt_estrazione_requisiti_lingua"])
       write_file("prompt_estrazione_requisiti_specialistica.txt",   st.session_state["prompt_estrazione_requisiti_specialistica"])
-      write_file("prompt_estrazione", st.session_state["prompt_estrazione_requisiti_titolo"]
-      write_file("prompt_estrazione", st.session_state["prompt_estrazione_requisiti_trasversale"]
-      write_file("prompt_match", st.session_state["prompt_match_competenza_attivita"]
-      write_file("prompt_match", st.session_state["prompt_match_competenza_certificazione"]
-      write_file("prompt_match", st.session_state["prompt_match_competenza_lingua"]
-      write_file("prompt_match", st.session_state["prompt_match_competenza_specialistica"]
-      write_file("prompt_match", st.session_state["prompt_match_competenza_titolo"]
-      prompt_match_industry = st.session_state["prompt_match_industry"]
-      st.session_state["prompt_trasformazione_requisiti_json"]
+      write_file("prompt_estrazione_requisiti_titolo",              st.session_state["prompt_estrazione_requisiti_titolo"])
+      write_file("prompt_estrazione_requisiti_rtasversale",         st.session_state["prompt_estrazione_requisiti_trasversale"])
+      write_file("prompt_match_competenza_attivita",                st.session_state["prompt_match_competenza_attivita"])
+      write_file("prompt_match_competenza_certificazione",          st.session_state["prompt_match_competenza_certificazione"])
+      write_file("prompt_match_competenza_lingua",                  st.session_state["prompt_match_competenza_lingua"])
+      write_file("prompt_match_competenza_specialistica",           st.session_state["prompt_match_competenza_specialistica"])
+      write_file("prompt_match_competenza_titolo",                  st.session_state["prompt_match_competenza_titolo"])
+      write_file("prompt_match_industry",                           st.session_state["prompt_match_industry"])
+      write_file("prompt_trasformazione_requisiti_json",            st.session_state["prompt_trasformazione_requisiti_json"])
       
-      # Salvataggio su file
-      with open(os.path.join('prompts','estrazione_industry.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_industry)
-      
-      with open(os.path.join('prompts','estrazione_esperienza_cv.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_esperienza_cv)
-        
-      with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_esperienza_jd)
-        
-      with open(os.path.join('prompts','estrazione_requisiti.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_requisiti)
-      
-      with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_estrazione_requisiti_json)
-      
-      with open(os.path.join('prompts','match_industry.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_match_industry)
-      
-      with open(os.path.join('prompts','match_competenza.txt'),'w', encoding='utf-8') as file:
-        file.write(prompt_match_competenza)
-            
     except Exception as e:
         error_string = traceback.format_exc()
         st.error(error_string)
         print(error_string)
-        
-
 
 try:
-    
     
     prompt_estrazione_esperienza_jd_default =             read_file('estrazione_esperienza_jd.txt')
     prompt_estrazione_esperienza_cv_default =             read_file('estrazione_esperienza_cv.txt')
