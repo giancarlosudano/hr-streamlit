@@ -18,19 +18,33 @@ import pandas as pd
 import re
 from utilities.AzureBlobStorageClient import AzureBlobStorageClient
 
+def read_file(file: str):
+  with open(os.path.join('prompts', file),'r', encoding='utf-8') as file:
+    return file.read()
+  
+def write_file(file: str, content: str):
+  with open(os.path.join('prompts', file),'w', encoding='utf-8') as file:
+    file.write(content)
+    
 def salvataggio():
     try:
-      
-      # Estrazione
-      prompt_estrazione_esperienza_jd = st.session_state["prompt_estrazione_esperienza_jd"]
-      prompt_estrazione_esperienza_cv = st.session_state["prompt_estrazione_esperienza_cv"]
-      prompt_estrazione_industry = st.session_state["prompt_estrazione_industry"]
-      prompt_estrazione_requisiti = st.session_state["prompt_estrazione_requisiti"]
-      prompt_estrazione_requisiti_json = st.session_state["prompt_estrazione_requisiti_json"]
-      
-      # Match
+            
+      write_file("prompt_estrazione_esperienza_jd.txt",             st.session_state["prompt_estrazione_esperienza_jd"])
+      write_file("prompt_estrazione_esperienza_cv.txt",             st.session_state["prompt_estrazione_esperienza_cv"])
+      write_file("prompt_estrazione_industry",                      st.session_state["prompt_estrazione_industry"])
+      write_file("prompt_estrazione_requisiti_attivita.txt",        st.session_state["prompt_estrazione_requisiti_attivita"])
+      write_file("prompt_estrazione_requisiti_certificazione.txt",  st.session_state["prompt_estrazione_requisiti_certificazione"])
+      write_file("prompt_estrazione_requisiti_lingua.txt",          st.session_state["prompt_estrazione_requisiti_lingua"])
+      write_file("prompt_estrazione_requisiti_specialistica.txt",   st.session_state["prompt_estrazione_requisiti_specialistica"])
+      write_file("prompt_estrazione", st.session_state["prompt_estrazione_requisiti_titolo"]
+      write_file("prompt_estrazione", st.session_state["prompt_estrazione_requisiti_trasversale"]
+      write_file("prompt_match", st.session_state["prompt_match_competenza_attivita"]
+      write_file("prompt_match", st.session_state["prompt_match_competenza_certificazione"]
+      write_file("prompt_match", st.session_state["prompt_match_competenza_lingua"]
+      write_file("prompt_match", st.session_state["prompt_match_competenza_specialistica"]
+      write_file("prompt_match", st.session_state["prompt_match_competenza_titolo"]
       prompt_match_industry = st.session_state["prompt_match_industry"]
-      prompt_match_competenza = st.session_state["prompt_match_competenza"]
+      st.session_state["prompt_trasformazione_requisiti_json"]
       
       # Salvataggio su file
       with open(os.path.join('prompts','estrazione_industry.txt'),'w', encoding='utf-8') as file:
@@ -58,69 +72,50 @@ def salvataggio():
         error_string = traceback.format_exc()
         st.error(error_string)
         print(error_string)
+        
+
 
 try:
     
-    # ESTRAZIONE
-    with open(os.path.join('prompts','estrazione_industry.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_industry_default = file.read()
     
-    with open(os.path.join('prompts','estrazione_esperienza_jd.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_esperienza_jd_default = file.read()
-
-    with open(os.path.join('prompts','estrazione_esperienza_cv.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_esperienza_cv_default = file.read()
-          
-    with open(os.path.join('prompts','estrazione_requisiti.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_requisiti_default = file.read()
-      
-    with open(os.path.join('prompts','estrazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
-      prompt_estrazione_requisiti_json_default = file.read()
-                
-    # MATCH
-    with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
-      prompt_match_industry_default = file.read()
-    
-    with open(os.path.join('prompts','match_competenza.txt'),'r', encoding='utf-8') as file:
-      prompt_match_competenza_default = file.read()
-    
-    # JD
-    with open(os.path.join('prompts','job_description.txt'),'r', encoding='utf-8') as file:
-      prompt_job_description_default = file.read()
+    prompt_estrazione_esperienza_jd_default =             read_file('estrazione_esperienza_jd.txt')
+    prompt_estrazione_esperienza_cv_default =             read_file('estrazione_esperienza_cv.txt')
+    prompt_estrazione_industry_default =                  read_file('estrazione_industry.txt')
+    prompt_estrazione_requisiti_attivita_default =        read_file('estrazione_requisiti_attivita.txt')
+    prompt_estrazione_requisiti_certificazione_default =  read_file('estrazione_requisiti_certificazione.txt')
+    prompt_estrazione_requisiti_lingua_default =          read_file('estrazione_requisiti_lingua.txt')
+    prompt_estrazione_requisiti_specialistica_default =   read_file('estrazione_requisiti_specialistica.txt')
+    prompt_estrazione_requisiti_titolo_default =          read_file('estrazione_requisiti_titolo.txt')
+    prompt_estrazione_requisiti_trasversale_default =     read_file('estrazione_requisiti_trasversale.txt')
+    prompt_job_description_default =                      read_file('job_description.txt')
+    prompt_match_competenza_attivita_default =            read_file('match_competenza_attivita.txt')
+    prompt_match_competenza_certificazione_default =      read_file('match_competenza_certificazione.txt')
+    prompt_match_competenza_lingua_default =              read_file('match_competenza_lingua.txt')
+    prompt_match_competenza_specialistica_default =       read_file('match_competenza_specialistica.txt')
+    prompt_match_competenza_titolo_default =              read_file('match_competenza_titolo.txt')
+    prompt_match_industry_default =                       read_file('match_industry.txt')            
+    prompt_trasformazione_requisiti_json_default =        read_file('trasformazione_requisiti_json.txt')
     
     st.title("Edit Prompt")
     
-    st.session_state["prompt_estrazione_industry"] = st.text_area(label="Prompt di estrazione industry :", value=prompt_estrazione_industry_default, height=300)
-    st.session_state["prompt_estrazione_esperienza_jd"] = st.text_area(label="Prompt di estrazione esperienza richiesta :", value=prompt_estrazione_esperienza_jd_default, height=300)
-    st.session_state["prompt_estrazione_esperienza_cv"] = st.text_area(label="Prompt di estrazione esperienza attuale :", value=prompt_estrazione_esperienza_cv_default, height=300)
-    st.session_state["prompt_estrazione_requisiti"] = st.text_area(label="Prompt di estrazione requisiti :", value=prompt_estrazione_requisiti_default, height=300)
-    st.session_state["prompt_estrazione_requisiti_json"] = st.text_area(label="Prompt di estrazione requisiti JSON :", value=prompt_estrazione_requisiti_json_default, height=300)
-    
-
-    st.session_state["prompt_match_industry"] = st.text_area(label="Prompt di match industry :", value=prompt_match_industry_default, height=300)
-    st.session_state["prompt_match_competenza"] = st.text_area(label="Prompt di match competenza :", value=prompt_match_competenza_default, height=300)
+    st.session_state["prompt_estrazione_esperienza_jd"] =             st.text_area(label="Prompt di estrazione esperienza richiesta :",     value=prompt_estrazione_esperienza_jd_default, height=300)
+    st.session_state["prompt_estrazione_esperienza_cv"] =             st.text_area(label="Prompt di estrazione esperienza attuale :",       value=prompt_estrazione_esperienza_cv_default, height=300)
+    st.session_state["prompt_estrazione_industry"] =                  st.text_area(label="Prompt di estrazione industry :",                 value=prompt_estrazione_industry_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_attivita"] =        st.text_area(label="Prompt di estrazione requisiti attivita :",       value=prompt_estrazione_requisiti_attivita_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_certificazione"] =  st.text_area(label="Prompt di estrazione requisiti certificazione :", value=prompt_estrazione_requisiti_certificazione_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_lingua"] =          st.text_area(label="Prompt di estrazione requisiti lingua :",         value=prompt_estrazione_requisiti_lingua_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_specialistica"] =   st.text_area(label="Prompt di estrazione requisiti specialistica :",  value=prompt_estrazione_requisiti_specialistica_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_titolo"] =          st.text_area(label="Prompt di estrazione requisiti titolo :",         value=prompt_estrazione_requisiti_titolo_default, height=300)
+    st.session_state["prompt_estrazione_requisiti_trasversale"] =     st.text_area(label="Prompt di estrazione requisiti trasversale :",    value=prompt_estrazione_requisiti_trasversale_default, height=300)
+    st.session_state["prompt_match_competenza_attivita"] =            st.text_area(label="Prompt di match competenza attivita :",           value=prompt_match_competenza_attivita_default, height=300)
+    st.session_state["prompt_match_competenza_certificazione"] =      st.text_area(label="Prompt di match competenza certificazione :",     value=prompt_match_competenza_certificazione_default, height=300)
+    st.session_state["prompt_match_competenza_lingua"] =              st.text_area(label="Prompt di match competenza lingua :",             value=prompt_match_competenza_lingua_default, height=300)
+    st.session_state["prompt_match_competenza_specialistica"] =       st.text_area(label="Prompt di match competenza specialistica :",      value=prompt_match_competenza_specialistica_default, height=300)
+    st.session_state["prompt_match_competenza_titolo"] =              st.text_area(label="Prompt di match competenza titolo :",             value=prompt_match_competenza_titolo_default, height=300)
+    st.session_state["prompt_match_industry"] =                       st.text_area(label="Prompt di match industry :",                      value=prompt_match_industry_default, height=300)
+    st.session_state["prompt_trasformazione_requisiti_json"] =        st.text_area(label="Prompt di trasformazione requisiti in Json :",    value=prompt_trasformazione_requisiti_json_default, height=300)
       
     st.button(label="Salvataggio Prompt", on_click=salvataggio)
-    
-    if st.button(label="Ripristino prompt originali"):
-      st.error("Vuoi veramente sovrascrivere tutti i prompt con quelli originali?")
-      if st.button("Yes, I'm sure"):
-        
-        import shutil
-
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_industry.txt'),os.path.join('prompts', 'estrazione_industry.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_esperienza_jd.txt'),os.path.join('prompts', 'estrazione_esperienza_jd.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_esperienza_cv.txt'),os.path.join('prompts', 'estrazione_esperienza_cv.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_requisiti.txt'),os.path.join('prompts', 'estrazione_requisiti.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_requisiti_json.txt'),os.path.join('prompts', 'estrazione_requisiti_json.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'estrazione_seniority.txt'),os.path.join('prompts', 'estrazione_seniority.txt') )
-        
-        shutil.copy2(os.path.join('prompts', 'defaults', 'match_industry.txt'),os.path.join('prompts', 'match_industry.txt') )
-        shutil.copy2(os.path.join('prompts', 'defaults', 'match_competenza.txt'),os.path.join('prompts', 'match_competenza.txt') )
-        
-        shutil.copy2(os.path.join('prompts', 'defaults', 'job_description.txt'),os.path.join('prompts', 'job_description.txt') )
-        
-        st.info("Ripristino completato")
     
 except Exception as e:
     st.error(traceback.format_exc())

@@ -53,9 +53,6 @@ def valutazione():
       with open(os.path.join('prompts','match_competenza_certificazione.txt'),'r', encoding='utf-8') as file:
         prompt_match_competenza_certificazione = file.read()
       
-      with open(os.path.join('prompts','match_competenza_industry.txt'),'r', encoding='utf-8') as file:
-        prompt_match_competenza_industry = file.read()
-      
       with open(os.path.join('prompts','match_competenza_lingua.txt'),'r', encoding='utf-8') as file:
         prompt_match_competenza_lingua = file.read()
       
@@ -72,10 +69,7 @@ def valutazione():
         prompt_match_industry = file.read()
         
       with open(os.path.join('prompts','trasformazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
-        prompt_trasformazione_requisiti_json = file.read()
-
-      with open(os.path.join('prompts','trasformazione_requisiti_merge.txt'),'r', encoding='utf-8') as file:
-        prompt_trasformazione_requisiti_merge = file.read()
+        prompt_trasformazione_requisiti_json = file.read() 
       
       llm_helper = LLMHelper(temperature=0, max_tokens=4000)
       
@@ -177,11 +171,11 @@ def valutazione():
         prompt_match=prompt_match_competenza_specialistica, 
         jd=jd, cv=cv)
       
-      estrazione_match_requisiti(tipologia="conoscenza trasversale", output=output, output_debug=output_debug, llm_helper=llm_helper, 
-        prompt_estrazione=prompt_estrazione_requisiti_trasversale, 
-        prompt_trasformazione="", 
-        prompt_match="", 
-        jd=jd, cv=cv)
+      # estrazione_match_requisiti(tipologia="conoscenza trasversale", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+      #   prompt_estrazione=prompt_estrazione_requisiti_trasversale, 
+      #   prompt_trasformazione="", 
+      #   prompt_match="", 
+      #   jd=jd, cv=cv)
       
       estrazione_match_requisiti(tipologia="titolo studio", output=output, output_debug=output_debug, llm_helper=llm_helper, 
         prompt_estrazione=prompt_estrazione_requisiti_titolo, 
