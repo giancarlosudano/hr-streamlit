@@ -5,7 +5,6 @@ Dato il seguente CV delimitato da ###, e la descrizione di una attività delimit
 - Mostra il ragionamento step by step che ti ha portato alla risposta
 - Mostra la risposta finale esclusivamente con il valore di True o False tra parentesi quadre
 
-
 il CV è il seguente:
 ###
 {cv}

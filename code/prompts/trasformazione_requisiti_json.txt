@@ -1,17 +1,20 @@
-Nel testo delimitato da ### trovi una lista di requisiti estratti da una Job Description suddivisi per categoria  
+Nel testo delimitato da ### trovi una lista di requisiti estratti da una Job Description suddivisi in due tipologie (obbligatoro e preferenziale)
  
+converti la lista delimitata da ### in un json con questa forma:
+ 
+{
+    "requisiti":     
+    [     
+        { "nome": "", "tipologia": "obbligatorio" },    
+        { "nome": "", "tipologia": "preferenziale" }     
+    ]
+}
+
+- se non ci sono tipologie "obbligatorio" o "preferenziale" considera sempre "obbligatorio"
+- nel testo non considerare i commenti iniziali o finali, concentrati solo sui requisiti
+
 ###  
 {lista}
 ###
-  
-crea un json con questa forma  
-  
-{    
-    "requisiti":     
-    [     
-        { "nome": "", "tipologia": "" },    
-        { "nome": "", "tipologia": "" }    
-    ]    
-}  
-  
-nel testo non considerare i commenti iniziali o finali, concentrati solo sui requisiti
+
+Risposta: 

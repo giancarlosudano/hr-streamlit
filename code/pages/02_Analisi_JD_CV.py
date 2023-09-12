@@ -39,10 +39,10 @@ def valutazione():
         prompt_estrazione_requisiti_lingua = file.read()
         
       with open(os.path.join('prompts','estrazione_requisiti_specialistica.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_requisiti_lingua = file.read()
+        prompt_estrazione_requisiti_specialistica = file.read()
         
       with open(os.path.join('prompts','estrazione_requisiti_titolo.txt'),'r', encoding='utf-8') as file:
-        prompt_estrazione_requisiti_specialistica = file.read()
+        prompt_estrazione_requisiti_titolo = file.read()
         
       with open(os.path.join('prompts','estrazione_requisiti_trasversale.txt'),'r', encoding='utf-8') as file:
         prompt_estrazione_requisiti_trasversale = file.read()
@@ -161,70 +161,48 @@ def valutazione():
       
       time.sleep(1)
       
-      # ESTRAZIONE REQUISITI
-      st.markdown("### Estrazione Requisiti dalla Job Description")
-      llm_requisiti_result_text = llm_helper.get_hr_completion(prompt_estrazione_requisiti.replace('{jd}', jd).replace('{cv}', cv))
-      st.markdown(llm_requisiti_result_text)
-      
-      output_debug.write(prompt_estrazione_requisiti)
-      output_debug.write("\n")
-      output_debug.write(llm_requisiti_result_text)
-      output_debug.write("\n")
-      output_debug.write("\n")
-
-      #ESTRAZIONE REQUISITI JSON
-      st.markdown("### Conversione Requisiti in JSON")
-      llm_requisiti_json_text = llm_helper.get_hr_completion(prompt_estrazione_requisiti_json.replace('{lista}', llm_requisiti_result_text))
-      
-      output_debug.write(llm_requisiti_json_text)
-      output_debug.write("\n")
-      
-      inizio_json_requisiti = llm_requisiti_json_text.index('{')
-      fine_json_requisiti = llm_requisiti_json_text.rindex('}') + 1
-      json_string_requisiti = llm_requisiti_json_text[inizio_json_requisiti:fine_json_requisiti]
-      json_data_requisiti = json.loads(json_string_requisiti)
-      
-      output_debug.write(json_string_requisiti)
-      output_debug.write("\n")
-      
-      st.markdown("Json Requisiti (iniziale):")
-      st.json(json_data_requisiti)
-      
       output_debug.write("Inizio Match Requisiti")
       output_debug.write(prompt_match_competenza)
       output_debug.write("\n")
       
-      requisiti_matching_count = 0
-      
-      for requisito in json_data_requisiti["requisiti"]:
-          nome = requisito["nome"]
-          tipologia = requisito["tipologia"]
-          if tipologia != "conoscenza trasversale":
-            llm_match_text = llm_helper.get_hr_completion(prompt_match_competenza.format(cv = cv, nome = nome))
-            
-            st.markdown(f"Requisito: :blue[{nome}]")
-            st.markdown("Risposta GPT: ")
-            st.markdown(f"{llm_match_text}")
-            
-            output_debug.write(nome)
-            output_debug.write("\n")
-            output_debug.write(tipologia)
-            output_debug.write("\n")
-            output_debug.write(llm_match_text)
-            output_debug.write("\n")
-            output_debug.write("\n")
-            
-            # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
-            if 'true]' in llm_match_text.lower() or 'true)' in llm_match_text or 'possibilmente vera' in llm_match_text.lower():
-                requisiti_matching_count = requisiti_matching_count + 1
-                output.append([tipologia, nome, "1"])                
-            else:
-                output.append([tipologia, nome, "0"])
-          else:
-            output.append([tipologia, nome, "NA"])
+      estrazione_match_requisiti(tipologia="principali attività", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_attivita, 
+        prompt_trasformazione=prompt_trasformazione_requisiti_json, 
+        prompt_match=prompt_match_competenza_attivita, 
+        jd=jd, cv=cv)
 
+      estrazione_match_requisiti(tipologia="conoscenza specialistica", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_specialistica, 
+        prompt_trasformazione=prompt_trasformazione_requisiti_json, 
+        prompt_match=prompt_match_competenza_specialistica, 
+        jd=jd, cv=cv)
+      
+      estrazione_match_requisiti(tipologia="conoscenza trasversale", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_trasversale, 
+        prompt_trasformazione="", 
+        prompt_match="", 
+        jd=jd, cv=cv)
+      
+      estrazione_match_requisiti(tipologia="titolo studio", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_titolo, 
+        prompt_trasformazione=prompt_trasformazione_requisiti_json, 
+        prompt_match=prompt_match_competenza_titolo, 
+        jd=jd, cv=cv)
+      
+      estrazione_match_requisiti(tipologia="certificazioni", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_certificazione, 
+        prompt_trasformazione=prompt_trasformazione_requisiti_json, 
+        prompt_match=prompt_match_competenza_certificazione, 
+        jd=jd, cv=cv)
+
+      estrazione_match_requisiti(tipologia="lingua", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_lingua, 
+        prompt_trasformazione=prompt_trasformazione_requisiti_json, 
+        prompt_match=prompt_match_competenza_lingua, 
+        jd=jd, cv=cv)
+      
       # Stampa finale
-      df = pd.DataFrame(output, columns = ['Tipologia', 'Elemento', 'Match'])
+      df = pd.DataFrame(output, columns = ['Tipologia', 'Nome', 'Obbl./Pref.',  'Match'])
       st.markdown(df.to_html(render_links=True),unsafe_allow_html=True)
       
       final_debug_text = output_debug.getvalue()
@@ -242,8 +220,69 @@ def valutazione():
         output_debug.close()
         st.download_button('Scarica il file per il debug', final_debug_text)
 
-try:
+def estrazione_match_requisiti(tipologia: str, output: [], output_debug: io, llm_helper: LLMHelper, prompt_estrazione: str, prompt_trasformazione: str, prompt_match, jd: str, cv: str):
+  # ESTRAZIONE REQUISITI
+  st.markdown("### Estrazione Requisiti dalla Job Description")
+  llm_requisiti_result_text = llm_helper.get_hr_completion(prompt_estrazione.replace('{jd}', jd).replace('{cv}', cv))
+  st.markdown(llm_requisiti_result_text)
+  
+  output_debug.write(prompt_estrazione)
+  output_debug.write("\n")
+  output_debug.write(llm_requisiti_result_text)
+  output_debug.write("\n")
+  output_debug.write("\n")
+
+  #TRASFORMAZIONE REQUISITI JSON
+  st.markdown("### Conversione Requisiti in JSON")
+  llm_requisiti_json_text = llm_helper.get_hr_completion(prompt_trasformazione.replace('{lista}', llm_requisiti_result_text))
+  
+  output_debug.write(llm_requisiti_json_text)
+  output_debug.write("\n")
+  
+  inizio_json_requisiti = llm_requisiti_json_text.index('{')
+  fine_json_requisiti = llm_requisiti_json_text.rindex('}') + 1
+  json_string_requisiti = llm_requisiti_json_text[inizio_json_requisiti:fine_json_requisiti]
+  json_data_requisiti = json.loads(json_string_requisiti)
+  
+  output_debug.write(json_string_requisiti)
+  output_debug.write("\n")
+  
+  st.markdown("Json Requisiti:")
+  st.json(json_data_requisiti)
+  
+  for requisito in json_data_requisiti["requisiti"]:
+    nome = requisito["nome"]
+    obbligatorieta = requisito["tipologia"]
     
+    if tipologia != "conoscenza trasversale":
+      llm_match_text = llm_helper.get_hr_completion(prompt_match.format(cv = cv, nome = nome))
+      
+      st.markdown(f"Requisito: :blue[{nome}]")
+      st.markdown("Risposta GPT: ")
+      st.markdown(f"{llm_match_text}")
+      
+      output_debug.write(nome)
+      output_debug.write("\n")
+      output_debug.write(tipologia)
+      output_debug.write("\n")
+      output_debug.write(obbligatorieta)
+      output_debug.write("\n")
+      output_debug.write(llm_match_text)
+      output_debug.write("\n")
+      output_debug.write("\n")
+      
+      # cerco la stringa "true]" invece di "[true]" perchè mi sono accorto che a volte usa la rispota [Risposta: True] invece di Risposta: [True]
+      # cerco anche la stringa "true)" perchè a volte usa la risposta (True) invece di [True]
+      # cerco anche la stringa "possibilmente vera" perchè a volte usa la risposta "Possibilmente vera" invece di [true]
+      if 'true]' in llm_match_text.lower() or 'true)' in llm_match_text or 'possibilmente vera' in llm_match_text.lower():
+          output.append([tipologia, nome, obbligatorieta, "1"])
+      else:
+          output.append([tipologia, nome, obbligatorieta, "0"])
+    else:
+      output.append([tipologia, nome, "NA", "NA"])
+
+try:
+
     with open(os.path.join('prompts','job_description.txt'),'r', encoding='utf-8') as file:
       jd_default = file.read()
     
