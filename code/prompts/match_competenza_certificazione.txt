@@ -1,4 +1,4 @@
-Dato il seguente CV delimitato da ###, e la descrizione di una certificazione delimtata da --- 
+Dato il seguente CV delimitato da ###, e la descrizione di una certificazione delimitata da --- 
 
 - Verifica se il candidato nel CV dichiara di possedere la certificazione
 - Mostra il ragionamento step by step che ti ha portato alla risposta

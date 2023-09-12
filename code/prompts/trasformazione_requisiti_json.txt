@@ -1,6 +1,6 @@
-Nel testo delimitato da ### trovi una lista di requisiti estratti da una Job Description suddivisi in due tipologie (obbligatoro e preferenziale)
+Nel testo delimitato da ### trovi una lista di requisiti estratti da una Job Description suddivisi in due tipologie (obbligatorio e preferenziale)
  
-converti la lista delimitata da ### in un json con questa forma:
+converti la lista delimitata da ### in un file JSON con questa forma:
  
 {
     "requisiti":     

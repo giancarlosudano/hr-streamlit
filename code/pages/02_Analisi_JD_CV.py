@@ -61,15 +61,12 @@ def valutazione():
         
       with open(os.path.join('prompts','match_competenza_titolo.txt'),'r', encoding='utf-8') as file:
         prompt_match_competenza_titolo = file.read()
-
-      with open(os.path.join('prompts','match_competenza.txt'),'r', encoding='utf-8') as file:
-        prompt_match_competenza = file.read()
       
       with open(os.path.join('prompts','match_industry.txt'),'r', encoding='utf-8') as file:
         prompt_match_industry = file.read()
         
       with open(os.path.join('prompts','trasformazione_requisiti_json.txt'),'r', encoding='utf-8') as file:
-        prompt_trasformazione_requisiti_json = file.read() 
+        prompt_trasformazione_requisiti_json = file.read()
       
       llm_helper = LLMHelper(temperature=0, max_tokens=4000)
       
@@ -156,7 +153,6 @@ def valutazione():
       time.sleep(1)
       
       output_debug.write("Inizio Match Requisiti")
-      output_debug.write(prompt_match_competenza)
       output_debug.write("\n")
       
       estrazione_match_requisiti(tipologia="principali attività", output=output, output_debug=output_debug, llm_helper=llm_helper, 
@@ -171,11 +167,11 @@ def valutazione():
         prompt_match=prompt_match_competenza_specialistica, 
         jd=jd, cv=cv)
       
-      # estrazione_match_requisiti(tipologia="conoscenza trasversale", output=output, output_debug=output_debug, llm_helper=llm_helper, 
-      #   prompt_estrazione=prompt_estrazione_requisiti_trasversale, 
-      #   prompt_trasformazione="", 
-      #   prompt_match="", 
-      #   jd=jd, cv=cv)
+      estrazione_match_requisiti(tipologia="conoscenza trasversale", output=output, output_debug=output_debug, llm_helper=llm_helper, 
+        prompt_estrazione=prompt_estrazione_requisiti_trasversale,
+        prompt_trasformazione=prompt_trasformazione_requisiti_json,
+        prompt_match="",
+        jd=jd, cv=cv)
       
       estrazione_match_requisiti(tipologia="titolo studio", output=output, output_debug=output_debug, llm_helper=llm_helper, 
         prompt_estrazione=prompt_estrazione_requisiti_titolo, 
