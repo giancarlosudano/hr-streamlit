@@ -125,9 +125,10 @@ def valutazione():
       output_debug.write("\n")
       output_debug.write("\n")
       
+      industry = ""
       match = re.search(r'\[(.*?)\]', llm_industry_result)
       if match:
-        industry = match.group(1)         
+        industry = match.group(1)  
       st.info(f"Industry considerata: {industry}")
       
       # MATCH INDUSTRY
